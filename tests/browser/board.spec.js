@@ -77,9 +77,9 @@ for (const [width, height] of [
     await expect(page.locator("html")).toHaveClass("board-mode");
     expect(await page.evaluate(() => document.fullscreenElement)).toBeNull();
     for (const [mode, labels] of Object.entries({
-      digits: ["1", "2", "3", "4", "5", "6", "7"],
+      digits: ["1", "2", "3", "4", "5", "6", "7", "1"],
       solfege: ["do", "re", "mi", "fa", "sol", "la", "si"],
-      european: ["C", "D", "E", "F", "G", "A", "H"],
+      european: ["C", "D", "E", "F", "G", "A", "H", "C"],
       gestures: null,
     })) {
       await page.locator("#board-settings").click();

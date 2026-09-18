@@ -70,6 +70,7 @@ test("names follow mixed task keys; switching presentation preserves wrong attem
     "D",
     "E",
     "F♯",
+    "G",
   ]);
   await page.locator('#answers button[data-degree="2"]').click();
   await page.locator("#answer-names").selectOption("solfege");
@@ -108,6 +109,7 @@ test("names follow mixed task keys; switching presentation preserves wrong attem
     "C",
     "D",
     "E",
+    "F",
   ]);
   await expect(page.locator("#answers button.wrong")).toHaveCount(0);
   await page.locator("#stop").click();

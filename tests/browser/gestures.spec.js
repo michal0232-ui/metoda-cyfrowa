@@ -31,7 +31,7 @@ test("gestures load, all presentations switch, European keys and persistence wor
     );
   }
   await modes.selectOption("digits");
-  await expect(buttons).toHaveText(["1", "2", "3", "4", "5", "6", "7"]);
+  await expect(buttons).toHaveText(["1", "2", "3", "4", "5", "6", "7", "1"]);
   await expect(buttons.locator("img")).toHaveCount(0);
   await modes.selectOption("solfege");
   await expect(buttons).toHaveText(names);
@@ -44,7 +44,7 @@ test("gestures load, all presentations switch, European keys and persistence wor
     F: ["F", "G", "A", "B", "C", "D", "E"],
   })) {
     await page.locator("#key").selectOption(key);
-    await expect(buttons).toHaveText(labels);
+    await expect(buttons).toHaveText([...labels, labels[0]]);
   }
   await modes.selectOption("gestures");
   await page.reload();

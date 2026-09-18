@@ -21,7 +21,7 @@ async function ready(page, settings) {
 }
 async function bands(page) {
   return page
-    .locator(".note-color-band")
+    .locator(".note-color-dot")
     .evaluateAll((els) => els.map((el) => el.style.backgroundColor));
 }
 const cColors = [
@@ -40,16 +40,18 @@ test("colors default off, remain independent in every mode, transpose and surviv
   await expect(page.locator("#note-colors")).toHaveValue("off");
   for (const mode of ["digits", "solfege", "european", "gestures"]) {
     await page.locator("#answer-names").selectOption(mode);
-    await expect(page.locator(".note-color-band")).toHaveCount(0);
+    await expect(page.locator(".note-color-dot")).toHaveCount(0);
     const height = await page
       .locator("#answers")
       .evaluate((el) => el.offsetHeight);
     await page.locator("#note-colors").selectOption("on");
-    expect(await bands(page)).toEqual(mode === "european" ? cColors : []);
+    expect(await bands(page)).toEqual(
+      ["digits", "european"].includes(mode) ? [...cColors, cColors[0]] : [],
+    );
     if (mode === "gestures")
       await expect(page.locator("#answers img")).toHaveCount(7);
     await page.locator("#note-colors").selectOption("off");
-    await expect(page.locator(".note-color-band")).toHaveCount(0);
+    await expect(page.locator(".note-color-dot")).toHaveCount(0);
     expect(
       await page.locator("#answers").evaluate((el) => el.offsetHeight),
     ).toBe(height);
@@ -58,7 +60,7 @@ test("colors default off, remain independent in every mode, transpose and surviv
   await page.locator(".key-picker summary").click();
   await page.getByLabel("Tonacja G-dur", { exact: true }).check();
   await page.locator("#key").selectOption("G");
-  await expect(page.locator(".note-color-band")).toHaveCount(0);
+  await expect(page.locator(".note-color-dot")).toHaveCount(0);
   await page.locator("#answer-names").selectOption("european");
   expect(await bands(page)).toEqual([
     cColors[4],
@@ -68,11 +70,12 @@ test("colors default off, remain independent in every mode, transpose and surviv
     cColors[1],
     cColors[2],
     "rgb(23, 107, 58)",
+    cColors[4],
   ]);
   await page.reload();
   await expect(page.locator("#note-colors")).toHaveValue("on");
   await expect(page.locator("#answer-names")).toHaveValue("european");
-  await expect(page.locator(".note-color-band")).toHaveCount(7);
+  await expect(page.locator(".note-color-dot")).toHaveCount(8);
   expect((await bands(page))[0]).toBe(cColors[4]);
   expect(errors).toEqual([]);
 });
@@ -253,8 +256,8 @@ for (const [width, height] of [
       await page.locator("#answer-names").selectOption(mode);
       for (const state of ["on", "off"]) {
         await page.locator("#note-colors").selectOption(state);
-        await expect(page.locator(".note-color-band")).toHaveCount(
-          state === "on" && mode === "european" ? 7 : 0,
+        await expect(page.locator(".note-color-dot")).toHaveCount(
+          state === "on" && ["digits", "european"].includes(mode) ? 8 : 0,
         );
       }
     }
@@ -303,20 +306,23 @@ for (const [key, degree, name, color] of [
       degrees: [degree],
       noteColors: true,
     });
-    for (const mode of ["digits", "solfege", "gestures"]) {
+    for (const mode of ["solfege", "gestures"]) {
       await page.locator("#answer-names").selectOption(mode);
       await expect(
-        page.locator(".note-color-band, .has-note-color"),
+        page.locator(".note-color-dot, .has-note-color"),
       ).toHaveCount(0);
-      expect(
-        await page
-          .locator("#answers button")
-          .evaluateAll(
-            (els) =>
-              new Set(els.map((el) => getComputedStyle(el).backgroundColor))
-                .size,
-          ),
-      ).toBe(1);
+      // A black piano key transitions to the neutral tile background.
+      await expect
+        .poll(() =>
+          page
+            .locator("#answers button")
+            .evaluateAll(
+              (els) =>
+                new Set(els.map((el) => getComputedStyle(el).backgroundColor))
+                  .size,
+            ),
+        )
+        .toBe(1);
     }
     const staveBefore = await page.locator("#notation .vf-stave").innerHTML();
     await page.locator("#start").click();

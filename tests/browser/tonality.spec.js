@@ -30,8 +30,13 @@ async function setup(page, settings) {
     const { AudioEngine } = await import(url);
     const play = AudioEngine.prototype.play;
     window.audioCalls = [];
+    const sourceStart = AudioBufferSourceNode.prototype.start;
+    AudioBufferSourceNode.prototype.start = function (time, ...args) {
+      window.audioCalls.at(-1)?.sourceStarts.push(time);
+      return sourceStart.call(this, time, ...args);
+    };
     AudioEngine.prototype.play = async function (events, ...args) {
-      const call = { events, start: performance.now() };
+      const call = { events, start: performance.now(), sourceStarts: [] };
       window.audioCalls.push(call);
       try {
         return await play.call(this, events, ...args);
@@ -59,17 +64,22 @@ for (const every of [0, 1, 3]) {
     for (let i = 1; i <= count; i++) {
       await page.locator('[data-degree="2"]').click();
       await expect(page.locator('[data-degree="2"]')).toBeDisabled();
-      await page.locator('[data-degree="1"]').click();
+      await page.locator('[data-degree="1"]').first().click();
       await expect(page.locator("#repeat")).toBeEnabled({ timeout: 10000 });
       const calls = await page.evaluate(() => window.audioCalls);
       const next = calls.at(-1),
         solution = calls.at(-2);
       expect(next.start - solution.end).toBeGreaterThanOrEqual(2950);
       expect(next.events.map((e) => e.notes.length)).toEqual(
-        every > 0 && i % every === 0 ? [1, 0, 1] : [1],
+        every > 0 && i % every === 0 ? [2, 0, 1] : [1],
       );
       expect(next.events.at(-1).notes).toEqual([60]);
-      if (next.events.length > 1) expect(next.events[0].notes).toEqual([48]);
+      if (next.events.length > 1) {
+        expect(next.events[0].notes).toEqual([48, 60]);
+        expect(next.sourceStarts).toHaveLength(3);
+        expect(next.sourceStarts[0]).toBe(next.sourceStarts[1]);
+        expect(next.sourceStarts[2]).toBeGreaterThan(next.sourceStarts[1]);
+      }
       for (let j = 1; j < calls.length; j++)
         expect(calls[j].start).toBeGreaterThanOrEqual(calls[j - 1].end);
     }
@@ -105,7 +115,7 @@ for (const [width, height] of [
     await page.locator("#reminder-every").selectOption("3");
     // Init script seeds storage on reload; remove it by using a fresh page in same context.
     const saved = await page.evaluate(() =>
-      JSON.parse(localStorage.getItem("functional-ear-trainer.settings.v1")),
+      JSON.parse(localStorage.getItem("metoda-cyfrowa.settings")),
     );
     expect(saved.reminderEvery).toBe(3);
     await page.evaluate(() => {

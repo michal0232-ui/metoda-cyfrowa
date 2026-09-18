@@ -72,6 +72,7 @@ test("cadence is reused unchanged in every key; tonic uses theory register; no r
     assert.deepEqual(questionEvents(q).slice(0, 5), cadenceEvents(key.id));
     assert.deepEqual(reminderEvents(key.id, "tonic")[0].notes, [
       degreeNote(key.id, 1).midi - 12,
+      degreeNote(key.id, 1).midi,
     ]);
     assert.deepEqual(questionEvents(q, null), [
       { notes: [q.note.midi], duration: 0.8, gap: 0.12 },

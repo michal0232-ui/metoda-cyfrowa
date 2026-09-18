@@ -20,3 +20,9 @@ export function cadencePitches(key) {
 export function reminderTonic(key) {
   return cadencePitches(key).at(-1)[0];
 }
+
+// Reminder octave is anchored to the cadence, never independently registered.
+export function tonicReminderPitches(key) {
+  const bass = reminderTonic(key);
+  return [bass, bass + 12];
+}

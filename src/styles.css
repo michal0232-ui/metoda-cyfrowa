@@ -857,23 +857,6 @@ footer span:first-child {
   }
 }
 
-/* Pitch colors are an optional strip, never the answer tile background. */
-.answers button.has-note-color {
-  padding-bottom: 26px;
-}
-.note-color-band {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 6px;
-  height: 12px;
-  border-radius: 5px;
-  pointer-events: none;
-}
-.answers button.wrong .note-color-band {
-  filter: grayscale(1);
-  opacity: 0.4;
-}
 #resolution {
   display: none;
   justify-content: center;
@@ -928,4 +911,101 @@ footer span:first-child {
   height: 24px;
   border-radius: 50%;
   border: 1px solid #0003;
+}
+
+/* One tonic–tonic octave; only scale pitches are answer buttons. */
+#answers.keyboard {
+  display: block;
+  position: relative;
+  height: clamp(200px, 25vw, 270px);
+  min-height: 200px;
+  isolation: isolate;
+  user-select: none;
+}
+#answers.keyboard > [data-key-tone] {
+  position: absolute;
+  box-sizing: border-box;
+  top: 0;
+  left: var(--key-left);
+  width: var(--key-width);
+  height: 100%;
+  min-height: 0;
+  border: 1px solid #9aa39c;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+  color: #173d35;
+  padding: 10px 2px;
+}
+#answers.keyboard > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  touch-action: manipulation;
+  transition: none;
+}
+#answers.keyboard > [data-key-tone="black"] {
+  height: 60%;
+  z-index: 2;
+  background: #20272a;
+  color: #fff;
+  border-color: #141a1d;
+}
+#answers.keyboard > .unused-key[data-key-tone="white"] {
+  background: #eef0ed;
+}
+#answers.keyboard > button:active:not(:disabled) {
+  box-shadow: inset 0 0 0 4px #95af59;
+  transform: none;
+}
+#answers.keyboard > button:focus-visible {
+  outline: 3px solid #648836;
+  outline-offset: -4px;
+}
+#answers.keyboard > button.wrong {
+  opacity: 0.4;
+  filter: grayscale(1);
+  text-decoration: line-through;
+}
+#answers.keyboard > button.correct {
+  box-shadow: inset 0 0 0 4px #648836;
+}
+.note-color-dot {
+  display: block;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #777;
+  pointer-events: none;
+}
+.board-mode #answers.keyboard {
+  height: 100%;
+  min-height: 0;
+}
+.board-mode #answers.keyboard > button {
+  font-size: clamp(24px, min(4vw, 7dvh), 76px);
+  padding: 8px 2px;
+}
+.board-mode .note-color-dot {
+  width: clamp(18px, 2.5dvh, 28px);
+  height: clamp(18px, 2.5dvh, 28px);
+}
+
+@media (max-width: 600px) {
+  #answers.keyboard {
+    margin-inline: -12px;
+    width: calc(100% + 24px);
+  }
+  #answers.keyboard > [data-key-tone="black"] {
+    width: max(44px, var(--key-width));
+    left: clamp(
+      0px,
+      calc(
+        var(--key-left) + (var(--key-width) - max(44px, var(--key-width))) / 2
+      ),
+      calc(100% - max(44px, var(--key-width)))
+    );
+  }
 }

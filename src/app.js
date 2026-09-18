@@ -2,6 +2,7 @@ import "./styles.css";
 import { mountBoardMode } from "./ui/board-mode.js";
 import { DEGREES, getKey, degreeNote } from "./music/theory.js";
 import { absoluteNote } from "./music/absolute-note.js";
+import { arrangeAnswers } from "./notation/answer-keyboard.js";
 import { ResolutionView } from "./notation/resolution-view.js";
 import { AudioEngine, delay } from "./audio/engine.js";
 import { SampleInstrument } from "./audio/sample-instrument.js";
@@ -78,17 +79,20 @@ function refreshControls() {
     "active",
     phase === "resolving" || phase === "waiting",
   );
-  for (const button of $("answers").children) {
+  arrangeAnswers($("answers"), currentKey(), settings.answerNames);
+  for (const button of $("answers").querySelectorAll("button[data-degree]")) {
     const degree = Number(button.dataset.degree);
     const content = answerContent(degree, currentKey(), settings.answerNames);
     const { label } = content;
     renderAnswerContent(button, content);
-    let band = button.querySelector(".note-color-band");
-    const colored = settings.noteColors && settings.answerNames === "european";
+    let band = button.querySelector(".note-color-dot");
+    const colored =
+      settings.noteColors &&
+      ["digits", "european"].includes(settings.answerNames);
     if (colored) {
       if (!band) {
         band = document.createElement("span");
-        band.className = "note-color-band";
+        band.className = "note-color-dot";
         band.setAttribute("aria-hidden", "true");
         button.append(band);
       }
@@ -96,7 +100,7 @@ function refreshControls() {
         degreeNote(currentKey(), degree),
       ).color;
     } else band?.remove();
-    button.classList.toggle("has-note-color", colored);
+
     const wrong = question?.wrongDegrees.includes(degree) ?? false;
     const correct = question?.solved && question.degree === degree;
     button.disabled = phase !== "answering" || wrong;
@@ -236,15 +240,22 @@ for (const degree of DEGREES) {
   const button = document.createElement("button");
   button.type = "button";
   button.dataset.degree = degree;
-  button.addEventListener("click", () => answer(degree));
   $("answers").append(button);
 }
+$("answers").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-degree]");
+  if (button && !button.disabled) answer(Number(button.dataset.degree));
+});
 mountSettings(settings, {
   onKeyChange: () => {
     if (ready) clearScore();
     refreshControls();
   },
   onNamesChange: refreshControls,
+  onReset: () => {
+    $("volume").value = settings.volume * 100;
+    updateVolume();
+  },
 });
 $("volume").value = settings.volume * 100;
 function updateVolume() {
@@ -298,6 +309,7 @@ async function initialize() {
     // The full VexFlow package embeds fonts locally; no external font request.
     await document.fonts.ready;
     clearScore();
+    document.documentElement.removeAttribute("data-settings-pending");
     await audio.prepare((loaded, total) => {
       status(`Ładowanie fortepianu: ${loaded}/${total} sampli…`);
     });

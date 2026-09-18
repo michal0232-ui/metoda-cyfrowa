@@ -189,9 +189,13 @@ natywny fullscreen i fallback. Nie zastępują kontroli na fizycznej tablicy Sam
 
 „Kolory dźwięków” to niezależne ustawienie Wyłączone/Włączone, domyślnie wyłączone.
 Jest zapisywane razem z pozostałymi ustawieniami, również przez panel Trybu tablicy.
-Cyfry, ruchoma solmizacja i gestodźwięki są reprezentacjami względnymi:
-pozostają neutralne także po włączeniu kolorów. Tylko nazwy europejskie mogą
-mieć pasek koloru odpowiadający absolutnej wysokości.
+Cyfry i nazwy europejskie są wyświetlane na klawiaturze od toniki do toniki (13 klawiszy chromatycznych, 8 aktywnych). Osiem klawiszy
+aktualnej tonacji odpowiada stopniom 1–2–3–4–5–6–7–1; obie toniki wybierają stopień 1, a pozostałe klawisze
+są nieaktywne i bez etykiet. Po włączeniu kolorów aktywny klawisz pokazuje
+oddzielną, małą kropkę absolutnej wysokości obok neutralnej cyfry lub nazwy.
+Dolna tonika pochodzi z `degreeNote(key, 1).midi`, tego samego rejestru co pytania; górna ma MIDI +12. Przy mieszaniu tonacji zakres aktualizuje się przed przypomnieniem i pytaniem. Oba klawisze toniki mają wspólny stan poprawnej/błędnej odpowiedzi.
+Cyfra nadal oznacza funkcję, a kropka — pitch class. Ruchoma solmizacja
+i gestodźwięki pozostają kafelkami bez kropek i kolorowania.
 Po poprawnej odpowiedzi kolory włączają podpis nazwy literowej z próbką koloru
 oraz kolor główki nuty (publiczne API VexFlow `setKeyStyle`). Pięciolinia,
 klucz i znaki przykluczowe nie są kolorowane. Przy wyłączonych kolorach główka
@@ -251,7 +255,7 @@ wielokrotność dodatniego okresu → wybrany rodzaj; w pozostałych przypadkach
 Zmiana tonacji wymusza przypomnienie także przy okresie 0. Zbieg obu warunków
 nie powoduje podwójnego odtwarzania.
 
-Pryma jest basem ostatniego akordu z `src/music/cadence.js`, a kadencja ma jedną wspólną implementację.
+Pryma jest czystą oktawą: pierwotny bas ostatniego akordu kadencji i dodatkowy dźwięk +12 MIDI, czyli `[bas, bas + 12]`, wyliczaną w `src/music/cadence.js`. Oba głosy startują jednocześnie na produkcyjnych samplach fortepianu. Kadencja ma jedną wspólną implementację.
 Obie korzystają z istniejących sampli fortepianu. Po rozwiązaniu i 3 sekundach
 jego ekspozycji losowane jest następne pytanie, odtwarzane przypomnienie,
 pauza 0,4 s i dźwięk pytania. Bez przypomnienia brzmi tylko dźwięk pytania.
@@ -265,7 +269,7 @@ zmiany wprowadza się przed nową sesją.
 Wzorzec kadencji jest zapisany w `src/music/cadence.js` jako przesunięcia MIDI
 od referencyjnego C4 (60). C-dur: `[48,64,67,72]`, `[53,65,69,72]`,
 `[55,64,67,72]`, `[43,62,67,71]`, `[48,64,67,72]`. Pierwszy dźwięk każdego
-akordu to bas; pozostałe to prawa ręka. Pryma C-dur: C3 (48).
+akordu to bas; pozostałe to prawa ręka. Pryma C-dur: C3 + C4 `[48, 60]`; G-dur: G2 + G3 `[43, 55]`; F-dur: F2 + F3 `[41, 53]`. Rejestr wynika zawsze z końcowego basu kadencji.
 Transpozycja dodaje do wszystkich dźwięków ten sam interwał `getKey(key).tonic - 60`.
 B-dur to identyfikator `Bb`; identyfikator `B` oznacza H-dur.
 Akordy brzmią równocześnie przez 0,62 s, odstęp w harmonogramie wynosi 0,10 s
@@ -274,3 +278,48 @@ Po kadencji pozostaje dodatkowa pauza 0,40 s przed pytaniem (0,50 s od końca
 nominalnego czasu ostatniego akordu). Nie zmieniono tempa.
 Nowy niski bas wymaga zakresu instrumentu od MIDI 36; najbliższe istniejące
 nagranie jest transponowane maksymalnie o trzy półtony. Pliki sampli są niezmienione.
+
+## Trwałe preferencje i reset
+
+Preferencje są jednym obiektem localStorage pod kluczem `metoda-cyfrowa.settings`:
+
+```json
+{
+  "version": 1,
+  "key": "C",
+  "keys": ["C"],
+  "mixKeys": false,
+  "reminderKind": "cadence",
+  "reminderEvery": 1,
+  "noteColors": false,
+  "answerNames": "digits",
+  "degrees": [1, 2, 3, 4, 5, 6, 7],
+  "volume": 0.5
+}
+```
+
+Wszystkie te preferencje były zapisywane już wcześniej; nowy mechanizm dodaje
+wersję schematu, migrację, zapis wyłącznie dozwolonych pól oraz potwierdzany reset.
+Po starcie aplikacja odczytuje i normalizuje dane przed pokazaniem ćwiczenia.
+Każda zmiana jest zapisywana od razu. Tryb tablicy korzysta z tego samego obiektu.
+Pytanie, błędy, postęp audio, timery, licznik sesji, statystyki bieżącej sesji
+i fullscreen nie są utrwalane.
+
+Stary klucz `functional-ear-trainer.settings.v1` jest odczytywany podczas
+migracji. Nowe dane mają pierwszeństwo; brakujące pola mogą zostać uzupełnione
+ze starego wpisu. Pola są walidowane osobno. Uszkodzony JSON pozwala skorzystać
+ze starego wpisu, a bez niego z wartości domyślnych. Stary wpis jest usuwany
+wyłącznie po udanym zapisie nowego. Obiekty bez wersji i wersja 0 są obsługiwane;
+nieznana nowsza wersja nie jest nadpisywana przez starszy kod. Jawny reset
+może zastąpić również taki obiekt wartościami domyślnymi.
+
+„Przywróć ustawienia domyślne” działa po zatrzymaniu treningu i wymaga
+potwierdzenia. Reset aktualizuje kontrolki i głośność bez przeładowania strony,
+nie usuwa danych innych aplikacji ani statystyk bieżącej sesji.
+
+LocalStorage nie używa cookies i przeżywa zamknięcie karty, przeglądarki oraz
+restart komputera w tym samym profilu i pod tym samym adresem aplikacji.
+Nie przeżyje świadomego usunięcia danych witryny; tryb prywatny może usuwać je
+po zamknięciu. Przy blokadzie zapisu aplikacja nadal działa z preferencjami
+w pamięci, lecz nie może zapewnić ich trwałości. Test przeglądarkowy zamyka
+Chrome i uruchamia go ponownie z tym samym katalogiem profilu na dysku.

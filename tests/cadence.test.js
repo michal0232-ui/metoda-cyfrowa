@@ -1,6 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cadencePitches, reminderTonic } from "../src/music/cadence.js";
+import {
+  cadencePitches,
+  reminderTonic,
+  tonicReminderPitches,
+} from "../src/music/cadence.js";
 import {
   cadenceEvents,
   reminderEvents,
@@ -17,6 +21,7 @@ test("C-major reference preserves exact octaves, voicing and descending dominant
   assert.deepEqual(cadencePitches("C"), reference);
   assert.equal(cadencePitches("C")[3][0], cadencePitches("C")[2][0] - 12);
   assert.equal(reminderTonic("C"), 48);
+  assert.deepEqual(tonicReminderPitches("C"), [48, 60]);
   assert.equal(reminderTonic("C"), cadencePitches("C")[4][0]);
 });
 for (const [key, shift] of [
@@ -38,7 +43,11 @@ for (const [key, shift] of [
       expected.map((notes) => ({ notes, duration: 0.62, gap: 0.1 })),
     );
     assert.deepEqual(reminderEvents(key, "tonic"), [
-      { notes: [expected[4][0]], duration: 0.62, gap: 0.1 },
+      {
+        notes: [expected[4][0], expected[4][0] + 12],
+        duration: 0.62,
+        gap: 0.1,
+      },
       { notes: [], duration: 0.4, gap: 0 },
     ]);
   });

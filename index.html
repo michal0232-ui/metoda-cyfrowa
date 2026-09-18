@@ -1,6 +1,11 @@
 <!doctype html>
-<html lang="pl">
+<html lang="pl" data-settings-pending>
   <head>
+    <style>
+      [data-settings-pending] .workspace {
+        visibility: hidden;
+      }
+    </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#173d35" />
@@ -186,6 +191,15 @@
                 zadania. Zmiana tonacji zawsze uruchamia wybrane przypomnienie.
                 Ustawienia zmienisz po zakończeniu treningu.
               </p>
+              <div class="setting-divider"></div>
+              <button
+                id="reset-settings"
+                type="button"
+                class="secondary"
+                style="min-height: 56px; width: 100%"
+              >
+                Przywróć ustawienia domyślne
+              </button>
             </fieldset>
             <div class="setting-divider"></div>
             <label class="field-label" for="answer-names"

@@ -1,4 +1,4 @@
-import { cadencePitches, reminderTonic } from "../music/cadence.js";
+import { cadencePitches, tonicReminderPitches } from "../music/cadence.js";
 import { degreeNote } from "../music/theory.js";
 
 // Each pair is [scale degree, octave relative to the question's tonic].
@@ -88,7 +88,7 @@ export function reminderEvents(key, kind) {
   if (!kind) return [];
   const events =
     kind === "tonic"
-      ? [{ notes: [reminderTonic(key)], duration: 0.62, gap: 0.1 }]
+      ? [{ notes: tonicReminderPitches(key), duration: 0.62, gap: 0.1 }]
       : cadenceEvents(key);
   return [...events, { notes: [], duration: 0.4, gap: 0 }];
 }

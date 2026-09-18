@@ -1,7 +1,10 @@
 import { DEGREES, KEYS } from "../music/theory.js";
-import { saveSettings } from "./settings.js";
+import { saveSettings, resetSettings } from "./settings.js";
 
-export function mountSettings(settings, { onKeyChange, onNamesChange }) {
+export function mountSettings(
+  settings,
+  { onKeyChange, onNamesChange, onReset },
+) {
   const $ = (id) => document.getElementById(id);
   function commitKeys() {
     if (!settings.keys.includes(settings.key)) settings.key = settings.keys[0];
@@ -123,6 +126,26 @@ export function mountSettings(settings, { onKeyChange, onNamesChange }) {
       saveSettings(settings);
     });
   }
+  $("reset-settings").addEventListener("click", () => {
+    if (
+      !window.confirm(
+        "Przywrócić wszystkie ustawienia domyślne? Zapisane preferencje zostaną zastąpione.",
+      )
+    )
+      return;
+    Object.assign(settings, resetSettings());
+    for (const input of $("degree-toggles").querySelectorAll("input"))
+      input.checked = settings.degrees.includes(Number(input.value));
+    $("selection-note").textContent =
+      `Wybrano ${settings.degrees.length} z 7 stopni.`;
+    $("answer-names").value = settings.answerNames;
+    $("note-colors").value = settings.noteColors ? "on" : "off";
+    $("reminder-kind").value = settings.reminderKind;
+    $("reminder-every").value = String(settings.reminderEvery);
+    commitKeys();
+    onNamesChange();
+    onReset();
+  });
   // Build settings before notation/fonts are ready; initial rendering stays in app.js.
   commitKeys();
 }

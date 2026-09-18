@@ -281,9 +281,3 @@ html.board-mode,
   height: clamp(36px, min(7vw, 8dvh), 96px);
   font-size: clamp(24px, 5dvh, 64px);
 }
-.board-mode .answers button.has-note-color {
-  padding-bottom: clamp(24px, 4dvh, 42px);
-}
-.board-mode .note-color-band {
-  height: clamp(12px, 2dvh, 24px);
-}

@@ -1,7 +1,8 @@
 import { DEGREES, KEYS } from "../music/theory.js";
 import { ANSWER_NAMES } from "../notation/answer-labels.js";
-// Keep the legacy storage key so renaming the app preserves saved settings.
-const STORAGE_KEY = "functional-ear-trainer.settings.v1";
+export const STORAGE_KEY = "metoda-cyfrowa.settings";
+export const SETTINGS_VERSION = 1;
+export const LEGACY_STORAGE_KEY = "functional-ear-trainer.settings.v1";
 export function normalizeSettings(value) {
   const degrees = [
     ...new Set(
@@ -37,17 +38,64 @@ export function normalizeSettings(value) {
       : 0.5,
   };
 }
-export function loadSettings() {
+function read(storage, key) {
   try {
-    return normalizeSettings(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+    const value = JSON.parse(storage.getItem(key));
+    return value && typeof value === "object" && !Array.isArray(value)
+      ? value
+      : null;
   } catch {
-    return normalizeSettings(null);
+    return null;
   }
 }
-export function saveSettings(settings) {
+function browserStorage() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    return globalThis.localStorage;
   } catch {
-    /* In-memory settings still work when storage is unavailable. */
+    return null;
   }
+}
+
+export function loadSettings(storage = browserStorage()) {
+  const current = read(storage, STORAGE_KEY);
+  const legacy = read(storage, LEGACY_STORAGE_KEY);
+  // Version 0 / unversioned objects use the original field names. Future migrations
+  // can transform this input before normalization; unknown newer versions are read-only.
+  const settings = normalizeSettings({ ...legacy, ...current });
+  saveSettings(settings, storage);
+  return settings;
+}
+export function saveSettings(settings, storage = browserStorage()) {
+  try {
+    const current = read(storage, STORAGE_KEY);
+    if (
+      Number.isInteger(current?.version) &&
+      current.version > SETTINGS_VERSION
+    )
+      return false;
+    // A whitelist excludes questions, timers, statistics and fullscreen even if supplied.
+    storage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        version: SETTINGS_VERSION,
+        ...normalizeSettings(settings),
+      }),
+    );
+    // Remove the legacy copy only AFTER a successful write, so failed migration loses nothing.
+    storage.removeItem(LEGACY_STORAGE_KEY);
+    return true;
+  } catch {
+    return false; // In-memory preferences still work when storage is unavailable/full.
+  }
+}
+export function resetSettings(storage = browserStorage()) {
+  const defaults = normalizeSettings(null);
+  try {
+    storage.removeItem(STORAGE_KEY);
+    storage.removeItem(LEGACY_STORAGE_KEY);
+  } catch {
+    /* Reset remains usable in memory. */
+  }
+  saveSettings(defaults, storage);
+  return defaults;
 }
