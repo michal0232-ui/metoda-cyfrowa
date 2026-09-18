@@ -24,62 +24,67 @@ npm run preview  # lokalny podgląd zbudowanej aplikacji
 
 Testy E2E korzystają z kanału `chrome`. Jeśli Chrome nie jest zainstalowany, zainstaluj Chromium poleceniem `npx playwright install chromium` i usuń `channel: 'chrome'` z `playwright.config.js`.
 
-## Publikacja: GitHub i Cloudflare Pages
+## Publikacja: Cloudflare Workers Builds
 
-Projekt jest statyczną aplikacją Vite (bez backendu, Functions i wymaganych sekretów).
-Nazwa repozytorium/projektu: `metoda-cyfrowa`. Plik `.nvmrc` wskazuje sprawdzoną
-wersję Node.js `24.13.0`; Cloudflare Pages obsługuje ten plik przy wyborze Node.js.
+Projekt jest statyczną aplikacją Vite. Istniejący Worker nazywa się dokładnie
+`metoda-cyfrowa`, a jego adres to https://metoda-cyfrowa.sgvb46s755.workers.dev.
+Repozytorium: `michal0232-ui/metoda-cyfrowa`, gałąź produkcyjna: `main`.
+Należy używać istniejącego Workera, bez tworzenia nowego projektu.
 
-Do repozytorium należy dodać kod, `package.json`, `package-lock.json`, `.nvmrc`,
-`.gitignore`, testy, wszystkie siedem plików w `assets/gestures/` oraz cały katalog
-`public/` (w tym 14 sampli MP3 i pliki autorstwa/licencji). `.gitignore` wyklucza
-zależności, build, raporty testów, pliki środowiskowe i lokalne pliki narzędzi.
-`private: true` w `package.json` chroni przed publikacją paczki npm i nie blokuje
-repozytorium GitHub ani hostingu Pages.
+Konfiguracja `wrangler.jsonc` wskazuje `assets.directory: "./dist"`.
+Nie jest potrzebny plik wejściowy Workera (`main`), binding zasobów ani plugin
+Cloudflare do Vite: aplikacja zawiera wyłącznie statyczny frontend.
+Wrangler jest zależnością developerską, a dokładne wersje zależności przechowuje
+`package-lock.json`. `.nvmrc` wskazuje Node.js `24.13.0`.
 
-Kontrola lokalna przed publikacją:
+Ustawienia do zastosowania w **istniejącym Workerze → Settings → Build**:
+
+| Ustawienie        | Wartość                        |
+| ----------------- | ------------------------------ |
+| Repozytorium      | `michal0232-ui/metoda-cyfrowa` |
+| Gałąź produkcyjna | `main`                         |
+| Root directory    | główny katalog repozytorium    |
+| Build command     | `npm run build`                |
+| Deploy command    | `npx wrangler deploy`          |
+| Katalog assetów   | `./dist` z `wrangler.jsonc`    |
+
+Build musi zakończyć się przed wywołaniem deploy. Samo `npx wrangler deploy`
+korzysta z istniejącego `dist`; nie dodano automatycznego build hooka.
+Połączenie repozytorium i aktywację automatycznych wdrożeń należy wykonać
+osobno, po zatwierdzeniu zmian. Konfiguracja musi być używana na koncie Cloudflare,
+na którym istnieje wskazany Worker. Nie zapisuj tokenów autoryzacyjnych w repozytorium.
+
+Lokalna kontrola bez publikacji:
 
 ```sh
-npm ci
+npm install
 npm test
-npm run test:e2e
 npm run build
 npm run preview
 ```
 
-Konfiguracja Cloudflare Pages po zatwierdzeniu publikacji:
+Nie ustawiaj instalacji z `--omit=dev`: zarówno Vite, jak i Wrangler są potrzebne
+podczas build/deploy. `private: true` chroni przed publikacją paczki npm i nie
+blokuje GitHuba ani Cloudflare. Aplikacja nie wymaga sekretów ani backendu.
 
-| Ustawienie                  | Wartość                                  |
-| --------------------------- | ---------------------------------------- |
-| Framework preset            | None (z jawną komendą Vite poniżej)      |
-| Root directory              | katalog główny repozytorium (pole puste) |
-| Build command               | `npm run build`                          |
-| Build output directory      | `dist`                                   |
-| Node.js                     | `24.13.0` z `.nvmrc`                     |
-| Sekrety / zmienne aplikacji | brak wymaganych                          |
+Działanie Vite pozostaje niezmienione: brak własnego `vite.config.*`, domyślne
+`base: "/"`, `publicDir: "public"` i `build.outDir: "dist"`. Sample oraz informacje
+o autorstwie trafiają do `dist/audio/salamander/`, a siedem grafik gestodźwięków
+jest kopiowanych przez Vite do `dist/assets/` z hashami w nazwach. JS, CSS i fonty
+nutowe są pakowane jak dotychczas. Ścieżki działają od korzenia domeny Workera;
+nie ustawiaj prefiksu `/metoda-cyfrowa/`.
 
-Nie ustawiaj instalacji z `--omit=dev`: Vite jest zależnością deweloperską potrzebną
-do budowania. Testy przeglądarkowe wymagają lokalnego Chrome i nie są częścią komendy
-build na Cloudflare. Serwer `npm run dev` służy wyłącznie do pracy lokalnej.
+Do repozytorium należą źródła, `wrangler.jsonc`, `package.json`, `package-lock.json`,
+`.nvmrc`, `.gitignore`, testy, `assets/gestures/` oraz cały `public/`, wraz z samplami
+MP3 i plikami licencyjnymi. `.gitignore` wyklucza `node_modules/`, `dist/`,
+`.wrangler/`, `.dev.vars*`, pliki `.env*` (poza przykładem) i lokalne raporty.
 
-Nie ma własnego `vite.config.*`: używane są domyślne `base: "/"`, `publicDir: "public"`
-i `build.outDir: "dist"`. Konfiguracja zakłada hosting pod głównym adresem domeny
-Pages lub domeny własnej. Sample i informacje o autorstwie są kopiowane bez zmian
-do `dist/audio/salamander/`; ścieżki `/audio/salamander/...` działają od korzenia domeny.
-Gesty wskazywane przez `new URL(..., import.meta.url)` trafiają do `dist/assets/`
-z hashami w nazwach, a Vite aktualizuje odwołania. Fonty nutowe są w pakiecie VexFlow,
-favicon jest osadzony w HTML, a JS i CSS również trafiają do `dist/assets/`.
-Nie należy ustawiać prefiksu `/metoda-cyfrowa/` na Cloudflare Pages.
+Widoczna nazwa to „Metoda Cyfrowa”. Dawna nazwa pozostaje w wewnętrznym kluczu
+localStorage i testach zgodności, aby nie resetować ustawień. Ustawienia localhost
+nie przenoszą się automatycznie na domenę Workera.
 
-Widoczna nazwa to „Metoda Cyfrowa”. Dawna nazwa pozostaje wyłącznie w wewnętrznym
-kluczu localStorage i testach zgodności, aby nie resetować istniejących ustawień.
-Ustawienia z localhost nie przenoszą się automatycznie na nową domenę.
-
-Instrukcje nie tworzą repozytorium ani deploymentu. Publikacja wymaga osobnego
-potwierdzenia właściciela projektu.
-
-Dokumentacja: [konfiguracja build Cloudflare Pages](https://developers.cloudflare.com/pages/configuration/build-configuration/)
-oraz [wybór wersji Node.js](https://developers.cloudflare.com/pages/configuration/build-image/).
+Dokumentacja: [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
+oraz [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/).
 
 ## Architektura
 
