@@ -155,3 +155,27 @@ Nazwy można przełączać również podczas zadania. Zmiana etykiet nie przeryw
 Format ustawień: `keys` — lista identyfikatorów tonacji, `key` — stała tonacja z tej listy, `mixKeys` — boolean, `answerNames` — `digits` / `solfege` / `european`, `degrees`, `volume`. Starsze ustawienia zawierające tylko `key` są automatycznie migrowane do jednoelementowej puli, z wyłączonym mieszaniem i etykietami cyfrowymi. Nieprawidłowe wartości są normalizowane do poprawnych ustawień.
 
 Każda tonacja posiada pole `mode`, a interwały skali pochodzą z rejestru `SCALES`. Obecnie zarejestrowano tylko `major`. Dodanie tonacji molowych w przyszłości wymaga rejestracji odpowiedniej skali/tonacji oraz osobnych definicji kadencji i rozwiązań ćwiczenia; obecne rozwiązania durowe pozostają niezależne od sposobu nazwania odpowiedzi.
+
+## Tryb tablicy
+
+Przycisk „⛶ Tryb tablicy” przełącza wyłącznie prezentację ćwiczenia: duża
+pięciolinia, status, sterowanie dźwiękiem i siedem kafelków mieszczą się w
+aktualnym viewport (`100dvh`) bez przewijania strony. Poniżej 1100 px szerokości
+kafelki przechodzą w układ 4+3. Wszystkie cztery sposoby prezentacji odpowiedzi
+pozostają dostępne.
+
+„Ustawienia” otwiera duży modal z istniejącymi kontrolkami. Przewijana może być
+tylko zawartość modalu, a jego przycisk zamknięcia pozostaje widoczny. Tonacja
+i wybór stopni zachowują dotychczasową blokadę podczas treningu; aby je zmienić,
+najpierw zamknij panel i zakończ trening. Otwarcie panelu nie przerywa audio.
+Skróty odpowiedzi 1–7 nie działają w otwartym modalu.
+
+Fullscreen jest żądany wyłącznie po kliknięciu przycisku wejścia. Jeśli API jest
+niedostępne lub odrzuci żądanie, layout tablicy działa w obszarze okna przeglądarki.
+Przycisk wyjścia oraz opuszczenie natywnego fullscreen (np. Esc) przywracają zwykły
+widok. Esc zamyka również panel ustawień, a w trybie bez fullscreen pozwala wyjść
+z tablicy. Tryb nie uruchamia się automatycznie po odświeżeniu.
+
+Testy w `tests/browser/board.spec.js` sprawdzają rozmiary 1920×1080, 1366×768,
+1280×720 i 900×720, kompletność widocznego ćwiczenia, odpowiedzi, ustawienia oraz
+natywny fullscreen i fallback. Nie zastępują kontroli na fizycznej tablicy Samsung Flip.

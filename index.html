@@ -17,6 +17,17 @@
   </head>
   <body>
     <div class="shell">
+      <nav id="board-toolbar" aria-label="Sterowanie tablicą" hidden>
+        <strong>Metoda Cyfrowa</strong>
+        <div>
+          <button id="board-settings" class="secondary" type="button">
+            Ustawienia
+          </button>
+          <button id="board-exit" class="secondary" type="button">
+            Wyjdź z trybu tablicy
+          </button>
+        </div>
+      </nav>
       <header class="header">
         <a class="brand" href="./" aria-label="Metoda Cyfrowa"
           ><span class="brand-mark" aria-hidden="true">♪</span
@@ -32,6 +43,14 @@
             <p>Rozpoznawaj stopnie gamy i usłysz, jak wracają do toniki.</p>
           </div>
           <span class="mode-tag">● &nbsp; Metoda cyfrowa</span>
+          <button
+            id="board-enter"
+            class="secondary"
+            type="button"
+            aria-pressed="false"
+          >
+            <span aria-hidden="true">⛶</span> Tryb tablicy
+          </button>
         </div>
         <div class="workspace">
           <section class="trainer card" aria-labelledby="exercise-title">
@@ -212,6 +231,20 @@
         <span>Metoda Cyfrowa</span><span>Ćwicz uważnie. Daj sobie czas.</span>
       </footer>
     </div>
+    <dialog id="board-settings-dialog" aria-label="Ustawienia tablicy">
+      <div class="board-dialog-heading">
+        <strong>Ustawienia tablicy</strong>
+        <button
+          id="board-settings-close"
+          type="button"
+          class="secondary"
+          autofocus
+        >
+          Zamknij ustawienia
+        </button>
+      </div>
+      <div id="board-settings-content"></div>
+    </dialog>
     <script type="module" src="/src/app.js"></script>
   </body>
 </html>

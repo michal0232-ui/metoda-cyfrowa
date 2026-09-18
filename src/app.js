@@ -1,4 +1,5 @@
 import "./styles.css";
+import { mountBoardMode } from "./ui/board-mode.js";
 import { DEGREES, getKey } from "./music/theory.js";
 import { AudioEngine, delay } from "./audio/engine.js";
 import { SampleInstrument } from "./audio/sample-instrument.js";
@@ -14,6 +15,7 @@ import {
 import { Statistics } from "./statistics/statistics.js";
 
 const $ = (id) => document.getElementById(id);
+mountBoardMode();
 const settings = loadSettings();
 const audio = new AudioEngine(new SampleInstrument(salamander));
 const staff = new Staff($("notation"));
@@ -215,6 +217,7 @@ $("repeat").addEventListener("click", async () => {
 });
 document.addEventListener("keydown", (event) => {
   if (
+    $("board-settings-dialog").open ||
     event.repeat ||
     event.ctrlKey ||
     event.metaKey ||

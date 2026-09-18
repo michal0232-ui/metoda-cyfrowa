@@ -1,0 +1,258 @@
+#board-enter,
+#board-toolbar button,
+.board-dialog-heading button {
+  min-height: 48px;
+  padding: 10px 16px;
+  border-radius: 10px;
+}
+#board-enter {
+  white-space: nowrap;
+}
+#board-toolbar[hidden] {
+  display: none;
+}
+#board-settings-dialog:not([open]) {
+  display: none;
+}
+
+html.board-mode,
+.board-mode body {
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.board-mode {
+  --board-gap: clamp(8px, 1.2dvh, 18px);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.board-mode .shell {
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  padding: max(8px, 1dvh) max(12px, 1.2vw);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--board-gap);
+}
+.board-mode .header,
+.board-mode .intro,
+.board-mode footer,
+.board-mode .statistics,
+.board-mode .workspace > .settings,
+.board-mode .steps,
+.board-mode .keyboard-hint,
+.board-mode .gentle-note,
+.board-mode .card-heading > div {
+  display: none;
+}
+#board-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: clamp(16px, 1.5vw, 28px);
+}
+#board-toolbar > div {
+  display: flex;
+  gap: var(--board-gap);
+}
+.board-mode main,
+.board-mode .workspace {
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+.board-mode .workspace {
+  display: block;
+}
+.board-mode .workspace .trainer {
+  height: 100%;
+  min-height: 0;
+  padding: var(--board-gap);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
+  gap: var(--board-gap);
+}
+.board-mode .card-heading {
+  grid-row: 1;
+  justify-content: center;
+}
+.board-mode .pill {
+  font-size: clamp(16px, 2dvh, 28px);
+  padding: 4px 16px;
+}
+.board-mode .score-panel {
+  grid-row: 2;
+  min-height: 0;
+  margin: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.board-mode #notation {
+  height: 100%;
+  min-height: 0;
+  max-width: none;
+}
+.board-mode #notation svg {
+  width: 100%;
+  height: 100% !important;
+  max-height: none;
+}
+.board-mode #score-caption {
+  margin: 0;
+  min-height: 0;
+  font-size: clamp(14px, 1.8dvh, 24px);
+}
+.board-mode .prompt {
+  grid-row: 3;
+  min-height: 0;
+}
+.board-mode .prompt p {
+  margin: 0;
+  font-size: clamp(18px, 2.7dvh, 34px);
+  line-height: 1.2;
+}
+.board-mode .transport {
+  grid-row: 4;
+  gap: var(--board-gap);
+}
+.board-mode .transport button {
+  min-height: clamp(48px, 6dvh, 76px);
+  font-size: clamp(16px, 2dvh, 26px);
+  padding: 8px clamp(12px, 2vw, 36px);
+}
+.board-mode .answers {
+  grid-row: 5;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: var(--board-gap);
+  min-height: 0;
+  margin: 0;
+}
+.board-mode .answers button {
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(6px, 1vw, 18px);
+  border-radius: clamp(12px, 1.5vw, 24px);
+  font-size: clamp(32px, min(6vw, 10dvh), 120px);
+  touch-action: manipulation;
+}
+.board-mode .answers button:active:not(:disabled) {
+  box-shadow: inset 0 0 0 4px #95af59;
+  transform: scale(0.97);
+}
+.board-mode .answer-gesture {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-width: none;
+  object-fit: contain;
+}
+.board-mode .answers button.correct:after {
+  font-size: clamp(20px, 3dvh, 36px);
+}
+
+#board-settings-dialog {
+  width: min(1100px, 96vw);
+  max-width: 96vw;
+  height: min(900px, 94dvh);
+  max-height: 94dvh;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--green);
+  overflow: hidden;
+}
+#board-settings-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+#board-settings-dialog::backdrop {
+  background: #173d35aa;
+}
+.board-dialog-heading {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+  font-size: clamp(18px, 2vw, 28px);
+}
+#board-settings-content {
+  overflow: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+  touch-action: pan-y;
+}
+#board-settings-content .settings {
+  border: 0;
+  box-shadow: none;
+  padding: 24px;
+}
+#board-settings-content
+  :is(
+    .field-label,
+    .mix-toggle,
+    select,
+    summary,
+    .degree-toggle span,
+    .key-actions button
+  ) {
+  font-size: 20px;
+}
+#board-settings-content
+  :is(select, summary, .degree-toggle span, .key-actions button, .mix-toggle) {
+  min-height: 56px;
+}
+#board-settings-content .mix-toggle input {
+  width: 28px;
+  height: 28px;
+}
+#board-settings-content :is(.small-note, .muted, .tip p) {
+  font-size: 16px;
+}
+#board-settings-content input[type="range"] {
+  height: 48px;
+}
+#board-settings-content .degree-toggles {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+#board-settings-content .key-toggles {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 1100px) {
+  .board-mode .answers {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .board-mode .workspace .trainer {
+    grid-template-rows: auto minmax(0, 0.8fr) auto auto minmax(0, 1.2fr);
+  }
+}
+@media (max-width: 600px) {
+  #board-toolbar > strong {
+    display: none;
+  }
+  #board-toolbar > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+  #board-toolbar button {
+    font-size: 14px;
+    padding: 8px;
+  }
+  .board-mode .transport button {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+  #board-settings-content .degree-toggles,
+  #board-settings-content .key-toggles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .board-dialog-heading {
+    padding: 8px;
+    font-size: 16px;
+  }
+}
