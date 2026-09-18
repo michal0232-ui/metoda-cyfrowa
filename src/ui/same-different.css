@@ -1,0 +1,135 @@
+/* Exercise views stay mutually exclusive even under board grid rules. */
+.workspace[hidden],
+#same-different[hidden],
+#board-settings[hidden] {
+  display: none !important;
+}
+.exercise-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.exercise-picker select,
+#board-exercise-select {
+  min-height: 48px;
+  max-width: 100%;
+  padding: 8px;
+  border: 1px solid #dbe1d5;
+  border-radius: 8px;
+  font: inherit;
+}
+#same-different {
+  text-align: center;
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+}
+#same-different h2,
+#pair-status {
+  margin: 0;
+}
+.pair-replays,
+.pair-answers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 3vw, 40px);
+}
+#same-different button {
+  touch-action: manipulation;
+  user-select: none;
+  border-radius: 16px;
+  border: 2px solid #b5c6ba;
+}
+.pair-replays button {
+  min-height: 110px;
+  font-size: clamp(48px, 8vw, 100px);
+  background: white;
+  color: #173d35;
+}
+.pair-answers button {
+  min-height: 160px;
+  font-size: clamp(28px, 4vw, 64px);
+  background: #f8faf5;
+  color: #173d35;
+  font-weight: 700;
+}
+.pair-answers button.wrong {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+.pair-answers button.correct {
+  border: 5px solid #648836;
+}
+#same-different button:active:not(:disabled) {
+  box-shadow: inset 0 0 0 4px #95af59;
+}
+.pair-transport {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.pair-transport button {
+  min-height: 48px;
+  padding: 12px 20px;
+}
+.pair-statistics {
+  text-align: left;
+}
+.board-mode .exercise-picker {
+  display: none;
+}
+.board-mode #same-different {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--board-gap);
+  gap: var(--board-gap);
+  grid-template-rows: auto auto minmax(0, 1fr) minmax(0, 1.5fr) auto;
+}
+.board-mode #same-different h2 {
+  font-size: clamp(24px, 4dvh, 48px);
+}
+.board-mode #pair-status {
+  font-size: clamp(16px, 2.5dvh, 28px);
+}
+.board-mode .pair-replays button,
+.board-mode .pair-answers button {
+  min-height: 0;
+  height: 100%;
+}
+.board-mode .pair-replays button {
+  font-size: clamp(48px, 15dvh, 160px);
+}
+.board-mode .pair-answers button {
+  font-size: clamp(28px, 7dvh, 90px);
+}
+.board-mode .pair-statistics {
+  display: none;
+}
+@media (max-width: 600px) {
+  #same-different {
+    padding: 12px;
+  }
+  #board-exercise-select {
+    max-width: 160px;
+    font-size: 12px;
+  }
+}
+/* Keep the shared toolbar compact; native selects otherwise inherit width:100%. */
+#board-exercise-select {
+  width: auto;
+  min-width: 0;
+}
+#board-toolbar button {
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  #board-toolbar > div {
+    flex-wrap: wrap;
+  }
+  #board-exercise-select {
+    max-width: none;
+    flex: 1 1 100%;
+  }
+}

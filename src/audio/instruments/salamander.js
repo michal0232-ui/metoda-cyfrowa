@@ -3,7 +3,7 @@ export const salamander = {
   id: "salamander-grand-piano",
   name: "Salamander Grand Piano",
   minMidi: 36,
-  maxMidi: 77,
+  maxMidi: 83,
   release: 0.12,
   samples: [
     [39, "Ds2"],

@@ -323,3 +323,48 @@ Nie przeżyje świadomego usunięcia danych witryny; tryb prywatny może usuwać
 po zamknięciu. Przy blokadzie zapisu aplikacja nadal działa z preferencjami
 w pamięci, lecz nie może zapewnić ich trwałości. Test przeglądarkowy zamyka
 Chrome i uruchamia go ponownie z tym samym katalogiem profilu na dysku.
+
+### Pomoc słuchowa „Zagraj rozwiązanie”
+
+Podczas oczekiwania na odpowiedź przycisk odtwarza rozwiązanie ukrytego stopnia
+z produkcyjnego `resolutionEvents`, bez wizualizacji i ujawniania odpowiedzi.
+Można używać go wielokrotnie. Na czas odsłuchu wstrzymane jest przyjmowanie
+odpowiedzi i uruchamianie innych odsłuchów; „Zakończ” przerywa również pomoc.
+Pytanie, wcześniejsze błędne wybory, statystyki i licznik przypomnień pozostają
+bez zmian. Funkcja działa we wszystkich prezentacjach i w Trybie tablicy.
+
+### Wybór ćwiczenia: „Ten sam czy inny?”
+
+Selektor w zwykłym widoku i na pasku tablicy przełącza między rozpoznawaniem
+stopni a porównywaniem dwóch dźwięków. Przełączenie zatrzymuje audio i bieżące
+zadanie; historie obu treningów pozostają oddzielne w pamięci bieżącej strony.
+Nowe ćwiczenie nie pokazuje pięciolinii, wysokości ani ustawień treningu stopni.
+
+- `src/ui/exercise-picker.js`: wspólny wybór z deskryptorami widoków oraz
+  metodami `activate`/`deactivate`. Kolejne ćwiczenie otrzyma osobny kontroler.
+- `src/exercises/same-different.js`: losowanie, zdarzenia audio, odpowiedzi
+  i rekord wyniku, niezależne od DOM. Domyślna pula to pełne cztery oktawy chromatyczne C2–H5:
+  48 równoprawnych wysokości MIDI 36–83. Konfiguracja modelu przyjmuje także własną
+  pulę wysokości i maksymalną odległość, bez nowych opcji w UI.
+- `src/ui/same-different-view.js` i `.css`: interfejs, cykl sesji, statystyki
+  i układ tablicowy. Korzystają z tego samego egzemplarza produkcyjnego silnika
+  audio oraz instrumentu Salamander co trening stopni.
+
+Każde zadanie niezależnie losuje typ pary z progiem 0,5, bez wyrównywania sesji.
+Dla pary „inny” niezależny los wybiera z prawdopodobieństwem 50% półton,
+a z 50% większą odległość. Półton losuje dostępny kierunek równomiernie
+(na granicach 36→37 i 83→82); większa odległość losuje równomiernie
+spośród wysokości oddalonych o ponad półton. „Ten sam” oznacza identyczne MIDI.
+Istniejący instrument obsługuje zakres do MIDI 83 przez transpozycję najbliższego
+sampla, bez nowych plików audio ani zmian wysokości treningu stopni. Pierwszy dźwięk trwa 0,62 s plus 0,12 s wyciszenia;
+potem następuje dokładnie 1,00 s ciszy. Drugi startuje 1,74 s po pierwszym.
+Harmonogram opiera się na zegarze Web Audio, a przerwa uwzględnia parametr
+`release` istniejącego instrumentu. Po poprawnej odpowiedzi pauza wynosi 1,20 s.
+
+① i ② powtarzają wyłącznie odpowiedni dźwięk. Nie są odpowiedzią i nie wpływają
+na wynik; liczby odsłuchów są zapisywane tylko w osobnym rekordzie zadania.
+Błędny wybór otrzymuje znak ✕ i jest blokowany. Uczeń może ponownie odsłuchać
+oba dźwięki i wybrać drugą odpowiedź. Poprawny wybór otrzymuje ✓ i uruchamia
+kolejne zadanie po pauzie, bez rozwiązania stopni. Podczas audio kontrolki
+odsłuchu i odpowiedzi są zablokowane. Zakończenie, zmiana ćwiczenia lub opuszczenie
+karty anuluje sesję i odtwarzanie.

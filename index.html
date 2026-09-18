@@ -25,6 +25,10 @@
       <nav id="board-toolbar" aria-label="Sterowanie tablicą" hidden>
         <strong>Metoda Cyfrowa</strong>
         <div>
+          <select
+            id="board-exercise-select"
+            aria-label="Rodzaj ćwiczenia na tablicy"
+          ></select>
           <button id="board-settings" class="secondary" type="button">
             Ustawienia
           </button>
@@ -57,6 +61,16 @@
             <span aria-hidden="true">⛶</span> Tryb tablicy
           </button>
         </div>
+        <div class="exercise-picker">
+          <label for="exercise-select">Rodzaj ćwiczenia</label
+          ><select id="exercise-select"></select>
+        </div>
+        <section
+          id="same-different"
+          class="card"
+          hidden
+          aria-label="Ten sam czy inny?"
+        ></section>
         <div class="workspace">
           <section class="trainer card" aria-labelledby="exercise-title">
             <div class="card-heading">
@@ -113,6 +127,8 @@
                 Przygotowywanie…</button
               ><button id="repeat" class="secondary" disabled>
                 ↻ &nbsp; Posłuchaj ponownie</button
+              ><button id="resolution-hint" class="secondary" disabled>
+                ▶ &nbsp; Zagraj rozwiązanie</button
               ><button id="stop" class="text-button" disabled>Zakończ</button>
               <button id="retry-audio" class="secondary" hidden>
                 Ponów ładowanie

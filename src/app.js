@@ -1,4 +1,6 @@
 import "./styles.css";
+import { mountExercisePicker } from "./ui/exercise-picker.js";
+import { mountSameDifferent } from "./ui/same-different-view.js";
 import { mountBoardMode } from "./ui/board-mode.js";
 import { DEGREES, getKey, degreeNote } from "./music/theory.js";
 import { absoluteNote } from "./music/absolute-note.js";
@@ -68,13 +70,17 @@ function refreshControls() {
   $("start").disabled = active || !ready;
   $("stop").disabled = !active;
   $("repeat").disabled = phase !== "answering";
+  $("resolution-hint").disabled = phase !== "answering";
   $("settings-fields").disabled = active;
   $("status-dot").classList.toggle(
     "playing",
-    phase === "listening" || phase === "resolving",
+    phase === "listening" || phase === "resolving" || phase === "hinting",
   );
   $("step-listen").classList.toggle("active", phase === "listening");
-  $("step-answer").classList.toggle("active", phase === "answering");
+  $("step-answer").classList.toggle(
+    "active",
+    phase === "answering" || phase === "hinting",
+  );
   $("step-resolve").classList.toggle(
     "active",
     phase === "resolving" || phase === "waiting",
@@ -103,7 +109,12 @@ function refreshControls() {
 
     const wrong = question?.wrongDegrees.includes(degree) ?? false;
     const correct = question?.solved && question.degree === degree;
-    button.disabled = phase !== "answering" || wrong;
+    // Keep answer appearance unchanged during audio-only help; answer() guards interaction.
+    button.disabled = !["answering", "hinting"].includes(phase) || wrong;
+    button.setAttribute(
+      "aria-disabled",
+      String(button.disabled || phase === "hinting"),
+    );
     button.classList.toggle("wrong", wrong);
     button.classList.toggle("correct", Boolean(correct));
     button.setAttribute(
@@ -270,6 +281,21 @@ $("volume").addEventListener("input", () => {
 });
 $("start").addEventListener("click", start);
 $("stop").addEventListener("click", () => stop());
+$("resolution-hint").addEventListener("click", async () => {
+  if (phase !== "answering") return;
+  const { signal } = controller;
+  setPhase("hinting");
+  status("Posłuchaj rozwiązania, a następnie wybierz odpowiedź.");
+  try {
+    // Same production events as a correct answer; deliberately no visual callback.
+    await audio.play(exercise.resolutionEvents(question), signal);
+    if (signal.aborted) return;
+    setPhase("answering");
+    status("Który stopień gamy słyszysz?");
+  } catch (error) {
+    handleError(error, signal);
+  }
+});
 $("repeat").addEventListener("click", async () => {
   if (phase !== "answering") return;
   const { signal } = controller;
@@ -281,6 +307,7 @@ $("repeat").addEventListener("click", async () => {
 });
 document.addEventListener("keydown", (event) => {
   if (
+    !exercisePicker.isActive("major-degrees") ||
     $("board-settings-dialog").open ||
     event.repeat ||
     event.ctrlKey ||
@@ -327,5 +354,27 @@ async function initialize() {
   }
 }
 $("retry-audio").addEventListener("click", initialize);
+const pairView = mountSameDifferent($("same-different"), audio);
+const exercisePicker = mountExercisePicker([
+  {
+    id: "major-degrees",
+    label: "Rozpoznawanie stopni",
+    element: document.querySelector(".workspace"),
+    hasSettings: true,
+    heading: "Poczuj miejsce dźwięku.",
+    description: "Rozpoznawaj stopnie gamy i usłysz, jak wracają do toniki.",
+    activate: () => {},
+    deactivate: () => stop(),
+  },
+  {
+    id: "same-different",
+    label: "Ten sam czy inny?",
+    element: $("same-different"),
+    hasSettings: false,
+    heading: "Ten sam czy inny?",
+    description: "Posłuchaj dwóch dźwięków i porównaj je.",
+    ...pairView,
+  },
+]);
 refreshControls();
 initialize();
