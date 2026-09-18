@@ -1,0 +1,13 @@
+Salamander Grand Piano — Alexander Holm
+Instrument recorded: Yamaha C5.
+Source: https://github.com/Tonejs/audio/tree/master/salamander
+MP3 files: https://tonejs.github.io/audio/salamander/
+Original sample library credited to Alexander Holm.
+License provided with this distribution: Creative Commons Attribution 3.0
+https://creativecommons.org/licenses/by/3.0/
+
+This application redistributes a subset of the MP3 files without editing them.
+Playback transposes the nearest recording by at most one semitone for the
+current exercise range, and applies gain and a short release envelope.
+This is a single dynamic layer, not the full multi-velocity SFZ instrument.
+The upstream README is included as SOURCE-README.txt.

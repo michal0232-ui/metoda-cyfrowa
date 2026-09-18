@@ -1,0 +1,36 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+.DS_Store
+
+# Local credentials and environment overrides
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+.npmrc
+*.pem
+*.key
+
+# Tool caches, reports and temporary files
+.vite/
+.wrangler/
+coverage/
+blob-report/
+playwright/.cache/
+*.log
+*.tsbuildinfo
+*.tmp
+*.swp
+*~
+tmp/
+temp/
+
+# Local editor / assistant configuration
+.idea/
+.vscode/
+.codex/
+.agents/
+Thumbs.db

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#173d35" />
+    <meta name="application-name" content="Metoda Cyfrowa" />
+    <meta
+      name="description"
+      content="Metoda Cyfrowa — trening rozpoznawania stopni gamy durowej ze słuchu."
+    />
+    <title>Metoda Cyfrowa</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23173d35'/%3E%3Ctext x='17' y='46' font-size='44' fill='%23ddedb8'%3E♪%3C/text%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="header">
+        <a class="brand" href="./" aria-label="Metoda Cyfrowa"
+          ><span class="brand-mark" aria-hidden="true">♪</span
+          ><span>Metoda<br /><strong>Cyfrowa</strong></span></a
+        >
+        <span class="version">PRACOWNIA SŁUCHU <span>v0.1</span></span>
+      </header>
+      <main>
+        <div class="intro">
+          <div>
+            <p class="eyebrow">SŁUCHAJ. ROZPOZNAWAJ. ROZWIJAJ SIĘ.</p>
+            <h1>Poczuj miejsce dźwięku.</h1>
+            <p>Rozpoznawaj stopnie gamy i usłysz, jak wracają do toniki.</p>
+          </div>
+          <span class="mode-tag">● &nbsp; Metoda cyfrowa</span>
+        </div>
+        <div class="workspace">
+          <section class="trainer card" aria-labelledby="exercise-title">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">ĆWICZENIE 01</p>
+                <h2 id="exercise-title">Stopnie gamy durowej</h2>
+              </div>
+              <span id="key-badge" class="pill">C-dur</span>
+            </div>
+            <div class="steps" aria-label="Przebieg zadania">
+              <span id="step-listen">01 <b>Posłuchaj</b></span
+              ><span id="step-answer">02 <b>Rozpoznaj</b></span
+              ><span id="step-resolve">03 <b>Usłysz rozwiązanie</b></span>
+            </div>
+            <div class="score-panel">
+              <div
+                id="notation"
+                role="img"
+                aria-label="Pusta pięciolinia z kluczem wiolinowym"
+              ></div>
+              <p id="score-caption">Nuta pojawi się po poprawnej odpowiedzi.</p>
+            </div>
+            <div class="prompt">
+              <span id="status-dot" class="status-dot"></span>
+              <p id="status" role="status" aria-live="polite">
+                Rozpocznij, by usłyszeć pierwsze zadanie.
+              </p>
+            </div>
+            <div
+              id="answers"
+              class="answers"
+              role="group"
+              aria-label="Wybierz stopień gamy"
+            ></div>
+            <p class="keyboard-hint">
+              Wybierz stopień dotykiem lub klawiszami 1–7.
+            </p>
+            <div class="transport">
+              <button id="start" class="primary" disabled>
+                Przygotowywanie…</button
+              ><button id="repeat" class="secondary" disabled>
+                ↻ &nbsp; Posłuchaj ponownie</button
+              ><button id="stop" class="text-button" disabled>Zakończ</button>
+              <button id="retry-audio" class="secondary" hidden>
+                Ponów ładowanie
+              </button>
+            </div>
+            <p class="gentle-note">
+              Możesz próbować do skutku. Błędna odpowiedź nie zdradza
+              rozwiązania.
+            </p>
+          </section>
+          <aside class="settings card" aria-labelledby="settings-title">
+            <p class="eyebrow">TWÓJ TRENING</p>
+            <h2 id="settings-title">Ustawienia</h2>
+            <fieldset id="settings-fields">
+              <legend class="sr-only">Ustawienia ćwiczenia</legend>
+              <p class="field-label">Tonacje durowe</p>
+              <label class="mix-toggle"
+                ><input id="mix-keys" type="checkbox" /> Mieszaj tonacje</label
+              >
+              <details class="key-picker">
+                <summary>Wybrane tonacje <span id="key-count"></span></summary>
+                <div class="key-actions">
+                  <button id="all-keys" type="button" class="secondary">
+                    Wszystkie</button
+                  ><button id="only-key" type="button" class="secondary">
+                    Tylko bieżąca
+                  </button>
+                </div>
+                <div
+                  id="key-toggles"
+                  class="key-toggles"
+                  role="group"
+                  aria-label="Wybierz tonacje"
+                ></div>
+              </details>
+              <p
+                id="key-selection-note"
+                class="small-note"
+                aria-live="polite"
+              ></p>
+              <label class="field-label" for="key">Stała tonacja</label
+              ><select id="key" aria-describedby="key-mode-note"></select>
+              <p id="key-mode-note" class="small-note"></p>
+              <div class="setting-divider"></div>
+              <p id="degrees-label" class="field-label">Ćwiczone stopnie</p>
+              <p class="muted">Wybierz dowolny zestaw dźwięków.</p>
+              <div
+                id="degree-toggles"
+                class="degree-toggles"
+                role="group"
+                aria-labelledby="degrees-label"
+              ></div>
+              <p id="selection-note" class="small-note" aria-live="polite">
+                Wybierz co najmniej jeden stopień.
+              </p>
+            </fieldset>
+            <div class="setting-divider"></div>
+            <label class="field-label" for="answer-names"
+              >Nazwy odpowiedzi</label
+            >
+            <select id="answer-names">
+              <option value="digits">Cyfry</option>
+              <option value="solfege">Solmizacja</option>
+              <option value="european">Nazwy europejskie</option>
+              <option value="gestures">Gestodźwięki</option>
+            </select>
+            <div class="setting-divider"></div>
+            <label class="field-label volume-label" for="volume"
+              >Głośność <output id="volume-value">50%</output></label
+            ><input id="volume" type="range" min="0" max="100" value="50" />
+            <div class="tip">
+              <span aria-hidden="true">♫</span>
+              <p>
+                Najpierw usłyszysz kadencję, potem pojedynczy dźwięk. Szukaj
+                jego miejsca w tonacji.
+              </p>
+            </div>
+            <p class="small-note">
+              Zakończ trening, aby zmienić tonację lub zestaw stopni.
+            </p>
+          </aside>
+          <section class="statistics card" aria-labelledby="statistics-title">
+            <div class="stats-title">
+              <div>
+                <p class="eyebrow">MAŁE KROKI, DOBRY SŁUCH</p>
+                <h2 id="statistics-title">Twój trening w liczbach</h2>
+              </div>
+              <span class="small-note"
+                >Bieżąca sesja · do odświeżenia strony</span
+              >
+            </div>
+            <div class="metrics">
+              <div>
+                <strong id="stat-total">0</strong
+                ><span>rozwiązanych zadań</span>
+              </div>
+              <div>
+                <strong id="stat-first">—</strong
+                ><span>poprawnych za pierwszym razem</span>
+              </div>
+              <div>
+                <strong id="stat-average">—</strong
+                ><span>średnia liczba prób</span>
+              </div>
+            </div>
+            <details>
+              <summary>
+                Historia odpowiedzi <span id="history-count">(0)</span>
+              </summary>
+              <p id="history-empty" class="muted">
+                Tutaj pojawią się rozwiązane zadania.
+              </p>
+              <div class="table-wrap">
+                <table id="history-table" hidden>
+                  <thead>
+                    <tr>
+                      <th>Zadanie</th>
+                      <th>Tonacja</th>
+                      <th>Stopień</th>
+                      <th>Próby</th>
+                      <th>Błędne wybory</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history"></tbody>
+                </table>
+              </div>
+            </details>
+          </section>
+        </div>
+      </main>
+      <footer>
+        <a href="/audio/salamander/CREDITS.txt" target="_blank" rel="noopener"
+          >Fortepian: Salamander · Alexander Holm · CC BY 3.0</a
+        >
+        <span>Metoda Cyfrowa</span><span>Ćwicz uważnie. Daj sobie czas.</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "metoda-cyfrowa",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "format": "prettier --write index.html src tests package.json playwright.config.js README.md"
+  },
+  "dependencies": {
+    "vexflow": "5.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "prettier": "^3.9.7",
+    "vite": "^7.1.0"
+  }
+}
