@@ -139,6 +139,7 @@ test("invalid saved settings recover to a valid nonempty pool", () => {
     key: "C",
     keys: ["C"],
     mixKeys: false,
+    noteColors: false,
     answerNames: "digits",
     degrees: [1, 2, 3, 4, 5, 6, 7],
     volume: 1,

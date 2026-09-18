@@ -33,12 +33,19 @@ export class AudioEngine {
         0.025,
       );
   }
-  async play(events, signal) {
+  async play(events, signal, onEvent) {
     await this.unlock();
     if (signal.aborted) throw new DOMException("Przerwano", "AbortError");
     let cursor = this.context.currentTime + 0.04;
     let end = cursor;
-    for (const event of events) {
+    const timeline = [];
+    for (const [index, event] of events.entries()) {
+      timeline.push({
+        index,
+        start: cursor,
+        end: cursor + event.duration + (event.gap ?? 0),
+        audible: event.notes.length > 0,
+      });
       event.notes.forEach((midi) => {
         const voiceEnd = this.instrument.schedule(this.context, this.master, {
           midi,
@@ -53,9 +60,17 @@ export class AudioEngine {
     end = Math.max(end, cursor);
     // AudioContext time is authoritative, including when the device suspends audio.
     await new Promise((resolve, reject) => {
+      let previous = null;
+      const update = (index) => {
+        if (previous !== index) {
+          previous = index;
+          onEvent?.(index);
+        }
+      };
       const cleanup = () => {
         clearInterval(timer);
         signal.removeEventListener("abort", abort);
+        update(null);
       };
       const abort = () => {
         cleanup();
@@ -63,6 +78,13 @@ export class AudioEngine {
         reject(new DOMException("Przerwano", "AbortError"));
       };
       const timer = setInterval(() => {
+        const now = this.context.currentTime;
+        if (onEvent)
+          update(
+            timeline.find(
+              (event) => event.audible && now >= event.start && now < event.end,
+            )?.index ?? null,
+          );
         if (this.context.currentTime >= end) {
           cleanup();
           resolve();

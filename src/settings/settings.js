@@ -22,6 +22,7 @@ export function normalizeSettings(value) {
     key: keys.includes(oldKey) ? oldKey : keys[0],
     keys,
     mixKeys: value?.mixKeys === true,
+    noteColors: value?.noteColors === true,
     answerNames: ANSWER_NAMES.includes(value?.answerNames)
       ? value.answerNames
       : "digits",

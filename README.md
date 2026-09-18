@@ -116,7 +116,7 @@ Nowe ćwiczenia mogą implementować interfejs `createQuestion`, `questionEvents
 - Start: C-dur, wszystkie stopnie, głośność 50%. Można wybrać dowolny niepusty zestaw stopni oraz jedną, kilka lub wszystkie z 13 pisowni tonacji durowych (Fis/Ges to dwie pisownie tej samej wysokości toniki).
 - Kadencja: cztery akordy I–IV–V–I, krótka przerwa, jeden dźwięk. Pytania obejmują stopnie w jednej oktawie od dolnej toniki do septymy. C-dur: C4–H4. Rejestry pozostałych tonacji są jawnie określone w `theory.js`.
 - Podczas kadencji, rozwiązania i przerwy odpowiedzi są nieaktywne. Po błędzie wybrany przycisk pozostaje wyszarzony i zablokowany, bez nuty ani rozwiązania. Powtórka odtwarza kadencję i ten sam dźwięk oraz zachowuje błędne próby.
-- Poprawna odpowiedź ujawnia dokładną nutę (cała nuta jako symbol wysokości, niezależnie od czasu odtwarzania), zapisuje zadanie i uruchamia rozwiązanie. Po jego zakończeniu i przerwie 1,5 s losowane jest następne zadanie. Powtórzenie tego samego stopnia w losowaniu jest dozwolone.
+- Poprawna odpowiedź ujawnia dokładną nutę (cała nuta jako symbol wysokości, niezależnie od czasu odtwarzania), zapisuje zadanie i uruchamia rozwiązanie. Po jego zakończeniu i przerwie 3 s losowane jest następne zadanie. Powtórzenie tego samego stopnia w losowaniu jest dozwolone.
 - „Zakończ” anuluje audio i oczekiwanie. Nierozwiązane zadanie jest porzucane, rozwiązane pozostaje w statystyce. Opuszczenie karty również zatrzymuje trening.
 - Statystyki bieżącej sesji pozostają w pamięci do odświeżenia strony. Każdy rekord zawiera `degree`, `key`, `attempts`, `wrongDegrees` w kolejności wyboru i `completedAt`. Pierwsza poprawna próba oznacza `attempts: 1`. Powtórne kliknięcie zablokowanego stopnia nie zwiększa liczby prób.
 - Ustawienia (stopnie, pula tonacji, stała tonacja, mieszanie, nazwy odpowiedzi i głośność) są zachowywane w localStorage. Brak dostępu do pamięci przeglądarki nie blokuje treningu.
@@ -157,7 +157,7 @@ W sekcji „Wybrane tonacje” można zaznaczać osobne tonacje, wybrać „Wszy
 
 Nazwy można przełączać również podczas zadania. Zmiana etykiet nie przerywa odtwarzania, nie zmienia stopnia, nie odblokowuje błędnych odpowiedzi i nie kasuje statystyki. Klawisze 1–7 zawsze odpowiadają stopniom gamy.
 
-Format ustawień: `keys` — lista identyfikatorów tonacji, `key` — stała tonacja z tej listy, `mixKeys` — boolean, `answerNames` — `digits` / `solfege` / `european`, `degrees`, `volume`. Starsze ustawienia zawierające tylko `key` są automatycznie migrowane do jednoelementowej puli, z wyłączonym mieszaniem i etykietami cyfrowymi. Nieprawidłowe wartości są normalizowane do poprawnych ustawień.
+Format ustawień: `keys` — lista identyfikatorów tonacji, `key` — stała tonacja z tej listy, `mixKeys` — boolean, `answerNames` — `digits` / `solfege` / `european` / `gestures`, `noteColors` — boolean (domyślnie `false`), `degrees`, `volume`. Starsze ustawienia zawierające tylko `key` są automatycznie migrowane do jednoelementowej puli, z wyłączonym mieszaniem i etykietami cyfrowymi. Nieprawidłowe wartości są normalizowane do poprawnych ustawień.
 
 Każda tonacja posiada pole `mode`, a interwały skali pochodzą z rejestru `SCALES`. Obecnie zarejestrowano tylko `major`. Dodanie tonacji molowych w przyszłości wymaga rejestracji odpowiedniej skali/tonacji oraz osobnych definicji kadencji i rozwiązań ćwiczenia; obecne rozwiązania durowe pozostają niezależne od sposobu nazwania odpowiedzi.
 
@@ -184,3 +184,51 @@ z tablicy. Tryb nie uruchamia się automatycznie po odświeżeniu.
 Testy w `tests/browser/board.spec.js` sprawdzają rozmiary 1920×1080, 1366×768,
 1280×720 i 900×720, kompletność widocznego ćwiczenia, odpowiedzi, ustawienia oraz
 natywny fullscreen i fallback. Nie zastępują kontroli na fizycznej tablicy Samsung Flip.
+
+## Kolory dźwięków i wizualizacja rozwiązania
+
+„Kolory dźwięków” to niezależne ustawienie Wyłączone/Włączone, domyślnie wyłączone.
+Jest zapisywane razem z pozostałymi ustawieniami, również przez panel Trybu tablicy.
+Cyfry, ruchoma solmizacja i gestodźwięki są reprezentacjami względnymi:
+pozostają neutralne także po włączeniu kolorów. Tylko nazwy europejskie mogą
+mieć pasek koloru odpowiadający absolutnej wysokości.
+Po poprawnej odpowiedzi kolory włączają podpis nazwy literowej z próbką koloru
+oraz kolor główki nuty (publiczne API VexFlow `setKeyStyle`). Pięciolinia,
+klucz i znaki przykluczowe nie są kolorowane. Przy wyłączonych kolorach główka
+jest czarna. `absolute-note.js` łączy absolutną pisownię i kolor MIDI;
+nie istnieje mapa stopnia, solmizacji ani gestu do koloru.
+
+Kolor wynika z rzeczywistej wysokości MIDI modulo 12, a nie ze stopnia gamy.
+Zależy zatem od tonacji bieżącego zadania (również przy mieszaniu tonacji), ale
+nie od oktawy ani enharmonicznej pisowni. Centralna paleta znajduje się w
+`src/music/note-colors.js`:
+
+| Dźwięk  | Kolor              | HEX       |
+| ------- | ------------------ | --------- |
+| C       | czerwony           | `#E53935` |
+| C♯ / D♭ | ciemnoczerwony     | `#9B1C20` |
+| D       | pomarańczowy       | `#F58220` |
+| D♯ / E♭ | ciemnopomarańczowy | `#A64B00` |
+| E       | żółty              | `#F9D635` |
+| F       | zielony            | `#36A657` |
+| F♯ / G♭ | ciemnozielony      | `#176B3A` |
+| G       | niebieski          | `#2474D2` |
+| G♯ / A♭ | burgundowy         | `#800020` |
+| A       | fioletowy          | `#8046B5` |
+| A♯ / B  | seledynowy         | `#A8DDB5` |
+| H       | różowy             | `#EF87B5` |
+
+Po poprawnej odpowiedzi zawsze pojawiają się pola z cyframi z istniejących fraz
+rozwiązania: zawsze neutralne. Dla stopni 5, 6 i 7 każda fraza ma osobną
+grupę. Oba motywy 7–1 zachowują ruch w górę, a drugi leży oktawę niżej.
+Cyfry są stale widoczne. Dla czytelności tablicy absolutny podpis dotyczy tylko
+rozpoznanej nuty, bez dodatkowej warstwy pod cyframi.
+Podświetlenie aktualnego pola korzysta z zegara AudioContext
+i nie przebudowuje elementów przy każdym odświeżeniu. Krótkie odstępy między
+dźwiękami nie powodują migotania; pauza pomiędzy frazami wygasza podświetlenie.
+
+Po zakończeniu odtwarzania cały przebieg pozostaje widoczny przez 3 sekundy,
+niezależnie od ustawienia kolorów. Dopiero potem zaczyna się następne zadanie.
+Zakończenie treningu usuwa wizualizację. Zmiana kolorów w trakcie rozwiązania
+nie przerywa audio ani postępu. W Trybie tablicy miejsce na rozwiązanie jest
+zarezerwowane od początku, aby nie przesuwać kafelków i nie powodować scrolla.

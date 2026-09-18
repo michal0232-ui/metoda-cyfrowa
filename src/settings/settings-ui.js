@@ -71,6 +71,12 @@ export function mountSettings(settings, { onKeyChange, onNamesChange }) {
     saveSettings(settings);
     onNamesChange();
   });
+  $("note-colors").value = settings.noteColors ? "on" : "off";
+  $("note-colors").addEventListener("change", () => {
+    settings.noteColors = $("note-colors").value === "on";
+    saveSettings(settings);
+    onNamesChange();
+  });
   for (const degree of DEGREES) {
     const label = document.createElement("label");
     label.className = "degree-toggle";

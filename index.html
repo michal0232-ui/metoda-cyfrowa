@@ -72,7 +72,21 @@
                 role="img"
                 aria-label="Pusta pięciolinia z kluczem wiolinowym"
               ></div>
-              <p id="score-caption">Nuta pojawi się po poprawnej odpowiedzi.</p>
+              <div class="score-caption-row">
+                <p id="score-caption">
+                  Nuta pojawi się po poprawnej odpowiedzi.
+                </p>
+                <span id="absolute-answer" hidden>
+                  <strong id="absolute-name"></strong>
+                  <span id="absolute-swatch" aria-hidden="true"></span>
+                </span>
+              </div>
+              <div
+                id="resolution"
+                role="group"
+                aria-label="Rozwiązanie metodą cyfrową"
+                aria-hidden="true"
+              ></div>
             </div>
             <div class="prompt">
               <span id="status-dot" class="status-dot"></span>
@@ -164,6 +178,12 @@
             <label class="field-label volume-label" for="volume"
               >Głośność <output id="volume-value">50%</output></label
             ><input id="volume" type="range" min="0" max="100" value="50" />
+            <div class="setting-divider"></div>
+            <label class="field-label" for="note-colors">Kolory dźwięków</label>
+            <select id="note-colors">
+              <option value="off">Wyłączone</option>
+              <option value="on">Włączone</option>
+            </select>
             <div class="tip">
               <span aria-hidden="true">♫</span>
               <p>

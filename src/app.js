@@ -1,6 +1,8 @@
 import "./styles.css";
 import { mountBoardMode } from "./ui/board-mode.js";
-import { DEGREES, getKey } from "./music/theory.js";
+import { DEGREES, getKey, degreeNote } from "./music/theory.js";
+import { absoluteNote } from "./music/absolute-note.js";
+import { ResolutionView } from "./notation/resolution-view.js";
 import { AudioEngine, delay } from "./audio/engine.js";
 import { SampleInstrument } from "./audio/sample-instrument.js";
 import { salamander } from "./audio/instruments/salamander.js";
@@ -19,6 +21,7 @@ mountBoardMode();
 const settings = loadSettings();
 const audio = new AudioEngine(new SampleInstrument(salamander));
 const staff = new Staff($("notation"));
+const resolution = new ResolutionView($("resolution"));
 const statistics = new Statistics();
 const exercise = majorDegrees;
 let phase = "idle";
@@ -33,11 +36,30 @@ function currentKey() {
   return question?.key ?? settings.key;
 }
 function clearScore() {
+  resolution.clear();
+  $("absolute-answer").hidden = true;
   staff.render(currentKey());
   $("key-badge").textContent = getKey(currentKey()).label;
   $("score-caption").textContent = "Nuta pojawi się po poprawnej odpowiedzi.";
 }
+function renderRecognizedNote() {
+  const recognized = question?.solved ? absoluteNote(question.note) : null;
+  $("absolute-answer").hidden = !recognized || !settings.noteColors;
+  if (!recognized) return;
+  staff.render(
+    question.key,
+    question.note,
+    settings.noteColors ? recognized.color : "#000000",
+  );
+  $("absolute-name").textContent = recognized.name;
+  $("absolute-swatch").style.backgroundColor = recognized.color;
+  $("absolute-answer").setAttribute(
+    "aria-label",
+    `Dźwięk absolutny: ${recognized.name}`,
+  );
+}
 function refreshControls() {
+  renderRecognizedNote();
   const active = phase !== "idle";
   $("start").disabled = active || !ready;
   $("stop").disabled = !active;
@@ -58,6 +80,20 @@ function refreshControls() {
     const content = answerContent(degree, currentKey(), settings.answerNames);
     const { label } = content;
     renderAnswerContent(button, content);
+    let band = button.querySelector(".note-color-band");
+    const colored = settings.noteColors && settings.answerNames === "european";
+    if (colored) {
+      if (!band) {
+        band = document.createElement("span");
+        band.className = "note-color-band";
+        band.setAttribute("aria-hidden", "true");
+        button.append(band);
+      }
+      band.style.backgroundColor = absoluteNote(
+        degreeNote(currentKey(), degree),
+      ).color;
+    } else band?.remove();
+    button.classList.toggle("has-note-color", colored);
     const wrong = question?.wrongDegrees.includes(degree) ?? false;
     const correct = question?.solved && question.degree === degree;
     button.disabled = phase !== "answering" || wrong;
@@ -160,19 +196,22 @@ async function answer(degree) {
   try {
     statistics.record(question);
     renderStatistics();
-    staff.render(question.key, question.note);
+    renderRecognizedNote();
     const phrases = resolutionPhrases(question.key, question.degree);
+    resolution.show(phrases);
     const notation = phrases
       .map((phrase) => phrase.map((note) => note.degree).join("–"))
       .join("  /  ");
     $("score-caption").textContent =
       `Stopień ${question.degree} · ${question.note.label} · ${notation}`;
     status(`Tak, to stopień ${question.degree}! Posłuchaj rozwiązania.`);
-    await audio.play(exercise.resolutionEvents(question), signal);
+    await audio.play(exercise.resolutionEvents(question), signal, (index) =>
+      resolution.highlight(index),
+    );
     if (signal.aborted) return;
     setPhase("waiting");
     status("Za chwilę kolejne zadanie…");
-    await delay(1500, signal);
+    await delay(3000, signal);
     await nextQuestion(signal);
   } catch (error) {
     handleError(error, signal);

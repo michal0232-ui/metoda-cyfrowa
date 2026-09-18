@@ -856,3 +856,76 @@ footer span:first-child {
     grid-row: 3;
   }
 }
+
+/* Pitch colors are an optional strip, never the answer tile background. */
+.answers button.has-note-color {
+  padding-bottom: 26px;
+}
+.note-color-band {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 6px;
+  height: 12px;
+  border-radius: 5px;
+  pointer-events: none;
+}
+.answers button.wrong .note-color-band {
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+#resolution {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 4px;
+}
+#resolution.visible {
+  display: flex;
+}
+.resolution-sequence {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.resolution-note {
+  display: grid;
+  place-items: center;
+  width: clamp(40px, 4vw, 64px);
+  height: clamp(40px, 4vw, 64px);
+  border-radius: 8px;
+  background: #edf1e7;
+  color: var(--green);
+  font-size: clamp(24px, 3vw, 42px);
+  font-weight: 700;
+}
+.resolution-note.playing {
+  outline: 3px solid #173d35;
+  outline-offset: 2px;
+  box-shadow: inset 0 -5px 0 currentColor;
+}
+
+.score-caption-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 32px;
+}
+#absolute-answer:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  white-space: nowrap;
+}
+#absolute-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #0003;
+}

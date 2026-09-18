@@ -11,7 +11,7 @@ export class Staff {
   constructor(element) {
     this.element = element;
   }
-  render(key = "C", note = null) {
+  render(key = "C", note = null, noteColor = "#000000") {
     this.element.replaceChildren();
     const renderer = new Renderer(this.element, Renderer.Backends.SVG);
     renderer.resize(640, 180);
@@ -27,6 +27,7 @@ export class Staff {
         clef: "treble",
         align_center: true,
       });
+      glyph.setKeyStyle(0, { fillStyle: noteColor, strokeStyle: noteColor });
       // The note spelling carries its actual accidental; applyAccidentals compares
       // it with the key signature to show only signs that are needed.
       const voice = new Voice({ num_beats: 4, beat_value: 4 }).addTickables([

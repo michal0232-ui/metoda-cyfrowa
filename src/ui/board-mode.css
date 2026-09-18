@@ -71,7 +71,7 @@ html.board-mode,
   min-height: 0;
   padding: var(--board-gap);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1.8fr) auto auto minmax(0, 1fr);
   gap: var(--board-gap);
 }
 .board-mode .card-heading {
@@ -228,7 +228,7 @@ html.board-mode,
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .board-mode .workspace .trainer {
-    grid-template-rows: auto minmax(0, 0.8fr) auto auto minmax(0, 1.2fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
   }
 }
 @media (max-width: 600px) {
@@ -255,4 +255,35 @@ html.board-mode,
     padding: 8px;
     font-size: 16px;
   }
+}
+
+/* Reserve the solution area from the start: playback never moves the tiles. */
+.board-mode .score-panel {
+  grid-template-rows: minmax(0, 1fr) auto clamp(72px, 12dvh, 130px);
+}
+.board-mode #resolution {
+  display: flex;
+  visibility: hidden;
+  min-height: 0;
+  flex-wrap: nowrap;
+  gap: clamp(10px, 2vw, 40px);
+  padding: 6px;
+}
+.board-mode #resolution.visible {
+  visibility: visible;
+}
+.board-mode .resolution-sequence {
+  gap: clamp(6px, 1vw, 16px);
+  padding: 6px;
+}
+.board-mode .resolution-note {
+  width: clamp(36px, min(7vw, 8dvh), 96px);
+  height: clamp(36px, min(7vw, 8dvh), 96px);
+  font-size: clamp(24px, 5dvh, 64px);
+}
+.board-mode .answers button.has-note-color {
+  padding-bottom: clamp(24px, 4dvh, 42px);
+}
+.board-mode .note-color-band {
+  height: clamp(12px, 2dvh, 24px);
 }
