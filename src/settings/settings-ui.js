@@ -65,6 +65,24 @@ export function mountSettings(settings, { onKeyChange, onNamesChange }) {
     settings.mixKeys = $("mix-keys").checked;
     commitKeys();
   });
+  $("reminder-kind").value = settings.reminderKind;
+  // Retain valid custom numeric frequencies loaded from future settings.
+  if (![0, 1, 2, 3, 5, 10].includes(settings.reminderEvery))
+    $("reminder-every").add(
+      new Option(
+        `Co ${settings.reminderEvery} odpowiedzi`,
+        String(settings.reminderEvery),
+      ),
+    );
+  $("reminder-every").value = String(settings.reminderEvery);
+  $("reminder-kind").addEventListener("change", () => {
+    settings.reminderKind = $("reminder-kind").value;
+    saveSettings(settings);
+  });
+  $("reminder-every").addEventListener("change", () => {
+    settings.reminderEvery = Number($("reminder-every").value);
+    saveSettings(settings);
+  });
   $("answer-names").value = settings.answerNames;
   $("answer-names").addEventListener("change", () => {
     settings.answerNames = $("answer-names").value;

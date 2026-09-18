@@ -7,6 +7,7 @@ import { AudioEngine, delay } from "./audio/engine.js";
 import { SampleInstrument } from "./audio/sample-instrument.js";
 import { salamander } from "./audio/instruments/salamander.js";
 import { majorDegrees, resolutionPhrases } from "./exercises/major-degrees.js";
+import { TonalitySession } from "./exercises/tonality-session.js";
 import { Staff } from "./notation/staff.js";
 import { loadSettings, saveSettings } from "./settings/settings.js";
 import { mountSettings } from "./settings/settings-ui.js";
@@ -28,6 +29,8 @@ let phase = "idle";
 let question = null;
 let controller = null;
 let ready = false;
+let tonalitySession = null;
+let questionReminder = null;
 
 function status(message) {
   $("status").textContent = message;
@@ -146,6 +149,8 @@ function stop(
   controller = null;
   audio.stop();
   question = null;
+  tonalitySession = null;
+  questionReminder = null;
   setPhase("idle");
   clearScore();
   status(message);
@@ -159,8 +164,14 @@ function handleError(error, signal) {
 }
 async function playQuestion(signal) {
   setPhase("listening");
-  status("Posłuchaj kadencji i pojedynczego dźwięku…");
-  await audio.play(exercise.questionEvents(question), signal);
+  status(
+    questionReminder === "cadence"
+      ? "Posłuchaj kadencji i pojedynczego dźwięku…"
+      : questionReminder === "tonic"
+        ? "Posłuchaj prymy i pojedynczego dźwięku…"
+        : "Posłuchaj pojedynczego dźwięku…",
+  );
+  await audio.play(exercise.questionEvents(question, questionReminder), signal);
   if (signal.aborted) return;
   setPhase("answering");
   status("Który stopień gamy słyszysz?");
@@ -168,11 +179,13 @@ async function playQuestion(signal) {
 async function nextQuestion(signal) {
   if (signal.aborted) return;
   question = exercise.createQuestion(settings);
+  questionReminder = tonalitySession.beginQuestion(question);
   clearScore();
   await playQuestion(signal);
 }
 async function start() {
   if (phase !== "idle" || !ready) return;
+  tonalitySession = new TonalitySession(settings);
   controller = new AbortController();
   const { signal } = controller;
   setPhase("listening");
@@ -191,6 +204,7 @@ async function answer(degree) {
     status("To nie ten stopień. Posłuchaj w myślach i spróbuj dalej.");
     return;
   }
+  tonalitySession.complete(question);
   const { signal } = controller;
   setPhase("resolving");
   try {

@@ -54,18 +54,27 @@ test("all piano samples decode before Start; playback uses buffers without reque
   await expect(page.locator("#start")).toBeEnabled();
   expect(await page.evaluate(() => window.decodedCount)).toBe(14);
   expect(requests).toHaveLength(14);
+  // All four voices of each chord start together; successive chords keep their tempo.
   // No runtime download should be needed, even without network.
   await page.context().setOffline(true);
   await page.locator("#start").click();
   await expect(page.locator("#repeat")).toBeEnabled({ timeout: 8000 });
   const before = await page.evaluate(() => window.recordings.length);
-  expect(before).toBe(17); // Four 4-note chords and the target.
+  expect(before).toBe(21); // Five 4-note chords and the target.
+  const starts = await page.evaluate(() =>
+    window.recordings.slice(0, 20).map((n) => n.time),
+  );
+  for (let chord = 0; chord < 5; chord++) {
+    expect(new Set(starts.slice(chord * 4, chord * 4 + 4)).size).toBe(1);
+    if (chord)
+      expect(starts[chord * 4] - starts[(chord - 1) * 4]).toBeCloseTo(0.72);
+  }
   await page.keyboard.press("2");
   expect(await page.evaluate(() => window.recordings.length)).toBe(before);
   await page.keyboard.press("7");
   await expect
     .poll(() => page.evaluate(() => window.recordings.length))
-    .toBe(21);
+    .toBe(25);
   const notes = await page.evaluate(() => window.recordings.slice(-4));
   // AudioParam stores 32-bit floats, while JS computes in 64-bit precision.
   for (const [index, rate] of [

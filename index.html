@@ -163,6 +163,29 @@
               <p id="selection-note" class="small-note" aria-live="polite">
                 Wybierz co najmniej jeden stopień.
               </p>
+              <div class="setting-divider"></div>
+              <p class="field-label">Przypomnienie tonacji</p>
+              <label class="field-label" for="reminder-kind">Rodzaj</label>
+              <select id="reminder-kind">
+                <option value="tonic">Pryma</option>
+                <option value="cadence">Kadencja</option>
+              </select>
+              <label class="field-label" for="reminder-every"
+                >Częstotliwość</label
+              >
+              <select id="reminder-every" aria-describedby="reminder-note">
+                <option value="0">Tylko na początku</option>
+                <option value="1">Co 1 odpowiedź</option>
+                <option value="2">Co 2 odpowiedzi</option>
+                <option value="3">Co 3 odpowiedzi</option>
+                <option value="5">Co 5 odpowiedzi</option>
+                <option value="10">Co 10 odpowiedzi</option>
+              </select>
+              <p id="reminder-note" class="small-note">
+                Na początku zawsze pełna kadencja. Liczymy poprawnie zakończone
+                zadania. Zmiana tonacji zawsze uruchamia wybrane przypomnienie.
+                Ustawienia zmienisz po zakończeniu treningu.
+              </p>
             </fieldset>
             <div class="setting-divider"></div>
             <label class="field-label" for="answer-names"

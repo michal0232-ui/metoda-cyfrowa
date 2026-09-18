@@ -1,3 +1,4 @@
+import { cadencePitches, reminderTonic } from "../music/cadence.js";
 import { degreeNote } from "../music/theory.js";
 
 // Each pair is [scale degree, octave relative to the question's tonic].
@@ -76,18 +77,24 @@ export function resolutionEvents(question) {
     ],
   );
 }
-export function questionEvents(question) {
-  const note = (degree, shift = 0) =>
-    degreeNote(question.key, degree, shift).midi;
-  const chords = [
-    [note(1, -1), note(1), note(3), note(5)],
-    [note(4, -1), note(1), note(4), note(6)],
-    [note(5, -1), note(7, -1), note(2), note(5)],
-    [note(1, -1), note(1), note(3), note(5)],
-  ];
+export function cadenceEvents(key) {
+  return cadencePitches(key).map((notes) => ({
+    notes,
+    duration: 0.62,
+    gap: 0.1,
+  }));
+}
+export function reminderEvents(key, kind) {
+  if (!kind) return [];
+  const events =
+    kind === "tonic"
+      ? [{ notes: [reminderTonic(key)], duration: 0.62, gap: 0.1 }]
+      : cadenceEvents(key);
+  return [...events, { notes: [], duration: 0.4, gap: 0 }];
+}
+export function questionEvents(question, reminder = "cadence") {
   return [
-    ...chords.map((notes) => ({ notes, duration: 0.62, gap: 0.1 })),
-    { notes: [], duration: 0.4, gap: 0 },
+    ...reminderEvents(question.key, reminder),
     { notes: [question.note.midi], duration: 0.8, gap: 0.12 },
   ];
 }

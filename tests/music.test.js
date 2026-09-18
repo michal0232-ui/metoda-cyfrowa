@@ -27,19 +27,27 @@ test("degree 7 resolves upward twice, with the entire second phrase an octave lo
   );
 });
 
-test("every exercise pitch is covered by local piano recordings within one semitone", () => {
+test("cadence fits existing samples within three semitones; questions and solutions within one", () => {
   for (const key of KEYS)
     for (let degree = 1; degree <= 7; degree++) {
       const question = createQuestion({ key: key.id, degrees: [degree] });
-      const events = [
-        ...questionEvents(question),
-        ...resolutionEvents(question),
-      ];
-      for (const midi of events.flatMap((event) => event.notes)) {
-        assert.ok(midi >= salamander.minMidi && midi <= salamander.maxMidi);
-        assert.ok(
-          Math.abs(nearestSample(salamander.samples, midi).midi - midi) <= 1,
-        );
+      const events = questionEvents(question);
+      for (const [notes, maxDistance] of [
+        [events.slice(0, 5).flatMap((e) => e.notes), 3],
+        [
+          [...events.slice(5), ...resolutionEvents(question)].flatMap(
+            (e) => e.notes,
+          ),
+          1,
+        ],
+      ]) {
+        for (const midi of notes) {
+          assert.ok(midi >= salamander.minMidi && midi <= salamander.maxMidi);
+          assert.ok(
+            Math.abs(nearestSample(salamander.samples, midi).midi - midi) <=
+              maxDistance,
+          );
+        }
       }
     }
 });
@@ -94,15 +102,16 @@ test("notation spelling resolves to exactly the same MIDI pitch in every key and
   assert.equal(degreeNote("B", 1).label, "H3");
   assert.equal(midiFrequency(69), 440);
 });
-test("question plays I–IV–V–I, then precisely its target", () => {
+test("question plays I–IV–I6/4–V–I, then precisely its target", () => {
   const question = createQuestion({ key: "C", degrees: [4] });
   assert.deepEqual(
     questionEvents(question).map((e) => e.notes),
     [
-      [48, 60, 64, 67],
-      [53, 60, 65, 69],
-      [55, 59, 62, 67],
-      [48, 60, 64, 67],
+      [48, 64, 67, 72],
+      [53, 65, 69, 72],
+      [55, 64, 67, 72],
+      [43, 62, 67, 71],
+      [48, 64, 67, 72],
       [],
       [65],
     ],
@@ -140,6 +149,8 @@ test("invalid saved settings recover to a valid nonempty pool", () => {
     keys: ["C"],
     mixKeys: false,
     noteColors: false,
+    reminderKind: "cadence",
+    reminderEvery: 1,
     answerNames: "digits",
     degrees: [1, 2, 3, 4, 5, 6, 7],
     volume: 1,

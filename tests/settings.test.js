@@ -53,7 +53,7 @@ test("mixing samples only selected keys and each question has its own cadence an
     assert.equal(q.degree, 7);
     assert.deepEqual(questionEvents(q).at(-1).notes, [q.note.midi]);
     assert.equal(
-      questionEvents(q)[0].notes[1],
+      questionEvents(q)[0].notes[0] + 12,
       KEYS.find((k) => k.id === key).tonic,
     );
   }

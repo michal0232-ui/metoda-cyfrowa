@@ -49,7 +49,7 @@ test("wrong answers never reveal a note; correct answer resolves and advances au
   await expect(page.locator("#history tr")).toHaveCount(1);
   await expect(page.locator("#history tr")).toHaveText("1C-dur432 → 6");
   await expect(page.locator("#stat-average")).toHaveText("3");
-  await expect(page.locator("#repeat")).toBeEnabled({ timeout: 10000 });
+  await expect(page.locator("#repeat")).toBeEnabled({ timeout: 12000 });
   await expect(page.locator("#answers button.wrong")).toHaveCount(0);
   await expect(page.locator("#answers button.correct")).toHaveCount(0);
   await expect(page.locator("#notation .vf-stavenote")).toHaveCount(0);

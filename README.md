@@ -114,8 +114,8 @@ Nowe ćwiczenia mogą implementować interfejs `createQuestion`, `questionEvents
 ## Zasady wersji 0.1
 
 - Start: C-dur, wszystkie stopnie, głośność 50%. Można wybrać dowolny niepusty zestaw stopni oraz jedną, kilka lub wszystkie z 13 pisowni tonacji durowych (Fis/Ges to dwie pisownie tej samej wysokości toniki).
-- Kadencja: cztery akordy I–IV–V–I, krótka przerwa, jeden dźwięk. Pytania obejmują stopnie w jednej oktawie od dolnej toniki do septymy. C-dur: C4–H4. Rejestry pozostałych tonacji są jawnie określone w `theory.js`.
-- Podczas kadencji, rozwiązania i przerwy odpowiedzi są nieaktywne. Po błędzie wybrany przycisk pozostaje wyszarzony i zablokowany, bez nuty ani rozwiązania. Powtórka odtwarza kadencję i ten sam dźwięk oraz zachowuje błędne próby.
+- Kadencja: pięć akordów I–IV–I6/4–V–I, krótka przerwa, jeden dźwięk. Pytania obejmują stopnie w jednej oktawie od dolnej toniki do septymy. C-dur: C4–H4. Rejestry pozostałych tonacji są jawnie określone w `theory.js`.
+- Podczas kadencji, rozwiązania i przerwy odpowiedzi są nieaktywne. Po błędzie wybrany przycisk pozostaje wyszarzony i zablokowany, bez nuty ani rozwiązania. Powtórka odtwarza przypomnienie wybrane dla bieżącego pytania (jeśli występuje) i ten sam dźwięk oraz zachowuje błędne próby.
 - Poprawna odpowiedź ujawnia dokładną nutę (cała nuta jako symbol wysokości, niezależnie od czasu odtwarzania), zapisuje zadanie i uruchamia rozwiązanie. Po jego zakończeniu i przerwie 3 s losowane jest następne zadanie. Powtórzenie tego samego stopnia w losowaniu jest dozwolone.
 - „Zakończ” anuluje audio i oczekiwanie. Nierozwiązane zadanie jest porzucane, rozwiązane pozostaje w statystyce. Opuszczenie karty również zatrzymuje trening.
 - Statystyki bieżącej sesji pozostają w pamięci do odświeżenia strony. Każdy rekord zawiera `degree`, `key`, `attempts`, `wrongDegrees` w kolejności wyboru i `completedAt`. Pierwsza poprawna próba oznacza `attempts: 1`. Powtórne kliknięcie zablokowanego stopnia nie zwiększa liczby prób.
@@ -141,7 +141,7 @@ Dokumentacja biblioteki zapisu: [VexFlow — Getting Started](https://vexflow.gi
 
 ## Instrument i preload
 
-14 lokalnych plików MP3 w `public/audio/salamander/` to nagrania fortepianu Salamander Grand Piano, obejmujące pełny zakres obecnych kadencji, pytań i rozwiązań. Mapa ma nagrania co trzy półtony; pozostałe dźwięki odtwarzamy z najbliższego sampla z transpozycją najwyżej o półton. Jest to jedna warstwa dynamiki, bez symulacji pedału i rezonansu pełnego instrumentu SFZ. Autorstwo, źródło i licencja CC BY 3.0: [CREDITS.txt](public/audio/salamander/CREDITS.txt).
+14 lokalnych plików MP3 w `public/audio/salamander/` to nagrania fortepianu Salamander Grand Piano, obejmujące pełny zakres obecnych kadencji, pytań i rozwiązań. Mapa ma nagrania co trzy półtony; pozostałe dźwięki odtwarzamy z najbliższego sampla z transpozycją najwyżej o półton dla pytań i rozwiązań, a dla najniższego basu nowej kadencji — najwyżej o trzy półtony. Jest to jedna warstwa dynamiki, bez symulacji pedału i rezonansu pełnego instrumentu SFZ. Autorstwo, źródło i licencja CC BY 3.0: [CREDITS.txt](public/audio/salamander/CREDITS.txt).
 
 Przed aktywowaniem przycisku Start aplikacja pobiera **i dekoduje wszystkie sample**. Ćwiczenie korzysta wyłącznie z buforów w pamięci, również po zmianie tonacji. Błąd pobrania/dekodowania blokuje trening i pokazuje możliwość ponowienia; nie ma zastępczej syntezy oscylatorem. Web Audio może pozostawać zawieszone podczas wstępnego ładowania — kliknięcie Start wznawia kontekst zgodnie z zasadami przeglądarki.
 
@@ -152,7 +152,7 @@ Aby podmienić zestaw nagrań, dodaj mapę instrumentu (MIDI, URL, zakres, relea
 W sekcji „Wybrane tonacje” można zaznaczać osobne tonacje, wybrać „Wszystkie” lub „Tylko bieżąca” (tonacja wskazana w polu „Stała tonacja”). Nie można odznaczyć ostatniej tonacji. Usunięcie aktualnej stałej tonacji z puli przełącza ją na pierwszą zaznaczoną.
 
 - **Mieszaj tonacje — wyłączone:** każde zadanie korzysta ze stałej tonacji wybranej z zaznaczonej puli.
-- **Mieszaj tonacje — włączone:** każde nowe zadanie niezależnie losuje tonację z puli; powtórzenie tonacji jest dozwolone. Pole stałej tonacji jest nieaktywne. Kadencja I–IV–V–I, nuty, kafelki oraz statystyka korzystają z tonacji konkretnego zadania. Powtórne odsłuchanie nie losuje nowej tonacji.
+- **Mieszaj tonacje — włączone:** każde nowe zadanie niezależnie losuje tonację z puli; powtórzenie tonacji jest dozwolone. Pole stałej tonacji jest nieaktywne. Kadencja I–IV–I6/4–V–I, nuty, kafelki oraz statystyka korzystają z tonacji konkretnego zadania. Powtórne odsłuchanie nie losuje nowej tonacji.
 - **Nazwy odpowiedzi:** cyfry 1–7, ruchoma solmizacja do–si lub rzeczywiste europejskie nazwy stopni aktualnej tonacji. H oznacza dźwięk B naturalny, B oznacza B♭. Znaki ♯/♭ wynikają z pisowni gamy; np. siódmy stopień Fis-dur to E♯, a czwarty Ges-dur to C♭.
 
 Nazwy można przełączać również podczas zadania. Zmiana etykiet nie przerywa odtwarzania, nie zmienia stopnia, nie odblokowuje błędnych odpowiedzi i nie kasuje statystyki. Klawisze 1–7 zawsze odpowiadają stopniom gamy.
@@ -232,3 +232,45 @@ niezależnie od ustawienia kolorów. Dopiero potem zaczyna się następne zadani
 Zakończenie treningu usuwa wizualizację. Zmiana kolorów w trakcie rozwiązania
 nie przerywa audio ani postępu. W Trybie tablicy miejsce na rozwiązanie jest
 zarezerwowane od początku, aby nie przesuwać kafelków i nie powodować scrolla.
+
+## Przypomnienie tonacji
+
+Ustawienia `reminderKind` (`cadence` — Kadencja, `tonic` — Pryma) i
+`reminderEvery` (liczba zakończonych zadań; `0` — tylko na początku) są
+przechowywane w dotychczasowym localStorage. Dostępne częstotliwości:
+0, 1, 2, 3, 5, 10. Model dopuszcza też inne nieujemne bezpieczne liczby całkowite.
+Domyślne wartości i migracja starych ustawień: `cadence`, `1`, czyli
+zachowana kadencja przed każdym pytaniem.
+
+Każde rozpoczęcie treningu tworzy nową sesję i zawsze zaczyna się pełną
+kadencją tonacji pierwszego pytania. Następnie licznik rośnie raz na poprawnie
+zakończone zadanie; błędne i ponowne odpowiedzi go nie zmieniają. Okres liczymy
+od początku sesji (zmiana tonacji nie zeruje licznika). Przed kolejnym pytaniem
+jedna decyzja wybiera przypomnienie: początek → kadencja; zmiana tonacji lub
+wielokrotność dodatniego okresu → wybrany rodzaj; w pozostałych przypadkach brak.
+Zmiana tonacji wymusza przypomnienie także przy okresie 0. Zbieg obu warunków
+nie powoduje podwójnego odtwarzania.
+
+Pryma jest basem ostatniego akordu z `src/music/cadence.js`, a kadencja ma jedną wspólną implementację.
+Obie korzystają z istniejących sampli fortepianu. Po rozwiązaniu i 3 sekundach
+jego ekspozycji losowane jest następne pytanie, odtwarzane przypomnienie,
+pauza 0,4 s i dźwięk pytania. Bez przypomnienia brzmi tylko dźwięk pytania.
+„Posłuchaj ponownie” powtarza ten sam zestaw audio bieżącego pytania,
+bez losowania tonacji i bez zwiększania licznika. „Zakończ” anuluje przebieg.
+
+Ustawienia dostępne są w zwykłym widoku i przewijanym wewnętrznie panelu
+Trybu tablicy. Tak jak wybór tonacji, są zablokowane podczas treningu;
+zmiany wprowadza się przed nową sesją.
+
+Wzorzec kadencji jest zapisany w `src/music/cadence.js` jako przesunięcia MIDI
+od referencyjnego C4 (60). C-dur: `[48,64,67,72]`, `[53,65,69,72]`,
+`[55,64,67,72]`, `[43,62,67,71]`, `[48,64,67,72]`. Pierwszy dźwięk każdego
+akordu to bas; pozostałe to prawa ręka. Pryma C-dur: C3 (48).
+Transpozycja dodaje do wszystkich dźwięków ten sam interwał `getKey(key).tonic - 60`.
+B-dur to identyfikator `Bb`; identyfikator `B` oznacza H-dur.
+Akordy brzmią równocześnie przez 0,62 s, odstęp w harmonogramie wynosi 0,10 s
+(starty co 0,72 s). Istniejące wybrzmiewanie sampla trwa dodatkowe 0,12 s.
+Po kadencji pozostaje dodatkowa pauza 0,40 s przed pytaniem (0,50 s od końca
+nominalnego czasu ostatniego akordu). Nie zmieniono tempa.
+Nowy niski bas wymaga zakresu instrumentu od MIDI 36; najbliższe istniejące
+nagranie jest transponowane maksymalnie o trzy półtony. Pliki sampli są niezmienione.

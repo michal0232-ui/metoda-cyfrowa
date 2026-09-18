@@ -22,6 +22,11 @@ export function normalizeSettings(value) {
     key: keys.includes(oldKey) ? oldKey : keys[0],
     keys,
     mixKeys: value?.mixKeys === true,
+    reminderKind: value?.reminderKind === "tonic" ? "tonic" : "cadence",
+    reminderEvery:
+      Number.isSafeInteger(value?.reminderEvery) && value.reminderEvery >= 0
+        ? value.reminderEvery
+        : 1,
     noteColors: value?.noteColors === true,
     answerNames: ANSWER_NAMES.includes(value?.answerNames)
       ? value.answerNames
