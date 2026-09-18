@@ -244,3 +244,45 @@ test.describe("touch settings and dynamic viewport", () => {
     expect(errors).toEqual([]);
   });
 });
+
+for (const [width, height] of [
+  [1920, 1080],
+  [1366, 768],
+  [1280, 720],
+]) {
+  test(`board notation is larger without moving answers, normal view restored ${width}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    const errors = await ready(page);
+    const normalView = await page
+      .locator("#notation svg")
+      .getAttribute("viewBox");
+    await page.locator("#board-enter").click();
+    const enlargement = await page.locator("#notation svg").evaluate((svg) => {
+      const boardView = svg.getAttribute("viewBox");
+      const enlarged = svg.getScreenCTM().a;
+      svg.setAttribute("viewBox", "0 0 640 180");
+      const previous = svg.getScreenCTM().a;
+      svg.setAttribute("viewBox", boardView);
+      return enlarged / previous;
+    });
+    expect(enlargement).toBeGreaterThanOrEqual(1.4);
+    await fits(page);
+    const answers = await page.locator("#answers").boundingBox();
+    await page.locator("#start").click();
+    await expect(page.locator("#repeat")).toBeEnabled({ timeout: 8000 });
+    await page.locator('[data-degree="5"]').click();
+    await expect(page.locator("#notation .vf-stavenote")).toHaveCount(1);
+    await fits(page);
+    expect(await page.locator("#answers").boundingBox()).toEqual(answers);
+    await page.screenshot({ path: `test-results/board-larger-${width}.png` });
+    await page.locator("#stop").click();
+    await page.locator("#board-exit").click();
+    await expect(page.locator("#notation svg")).toHaveAttribute(
+      "viewBox",
+      normalView,
+    );
+    expect(errors).toEqual([]);
+  });
+}

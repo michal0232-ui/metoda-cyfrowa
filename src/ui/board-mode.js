@@ -1,4 +1,5 @@
 import "./board-mode.css";
+import { fitStaffViewport } from "../notation/staff.js";
 
 export function mountBoardMode() {
   const root = document.documentElement;
@@ -22,6 +23,7 @@ export function mountBoardMode() {
     if (dialog.open) dialog.close();
     restoreSettings();
     root.classList.remove("board-mode");
+    fitStaffViewport(document.getElementById("notation"));
     toolbar.hidden = true;
     enter.setAttribute("aria-pressed", "false");
     enter.focus({ preventScroll: true });
@@ -30,6 +32,7 @@ export function mountBoardMode() {
   enter.addEventListener("click", () => {
     active = true;
     root.classList.add("board-mode");
+    fitStaffViewport(document.getElementById("notation"));
     toolbar.hidden = false;
     enter.setAttribute("aria-pressed", "true");
     window.scrollTo(0, 0);

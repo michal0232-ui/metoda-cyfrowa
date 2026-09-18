@@ -7,6 +7,18 @@ import {
   Voice,
 } from "vexflow/bravura";
 
+// Board notation uses the available height for the stave instead of SVG margins.
+export function fitStaffViewport(element) {
+  element
+    ?.querySelector("svg")
+    ?.setAttribute(
+      "viewBox",
+      document.documentElement.classList.contains("board-mode")
+        ? "0 35 640 120"
+        : "0 0 640 180",
+    );
+}
+
 export class Staff {
   constructor(element) {
     this.element = element;
@@ -38,7 +50,7 @@ export class Staff {
       voice.draw(context, stave);
     }
     const svg = this.element.querySelector("svg");
-    svg.setAttribute("viewBox", "0 0 640 180");
+    fitStaffViewport(this.element);
     svg.removeAttribute("width");
     svg.removeAttribute("height");
     svg.style.width = "100%";
